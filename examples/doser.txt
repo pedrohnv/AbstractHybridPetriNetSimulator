@@ -1,0 +1,77 @@
+// Places
+// valves
+p0 = doser.addPlace(new DiscretePlace("closed valve, desaeration", 1));
+p1 = doser.addPlace(new DiscretePlace("open valve, desaeration", 0));
+p2 = doser.addPlace(new DiscretePlace("closed valve, charge doser", 1));
+p3 = doser.addPlace(new DiscretePlace("open valve, charge doser", 0));
+p4 = doser.addPlace(new DiscretePlace("closed valve, silo fluidization", 1));
+p5 = doser.addPlace(new DiscretePlace("open valve, silo fluidization", 0));
+p6 = doser.addPlace(new DiscretePlace("closed valve, discharge silo", 1));
+p7 = doser.addPlace(new DiscretePlace("open valve, discharge silo", 0));
+p8 = doser.addPlace(new DiscretePlace("closed valve, doser pressurization", 1));
+p9 = doser.addPlace(new DiscretePlace("open valve, doser pressurization", 0));
+p10 = doser.addPlace(new DiscretePlace("closed valve, relief", 1));
+p11 = doser.addPlace(new DiscretePlace("open valve, relief", 0));
+p12 = doser.addPlace(new DiscretePlace("closed valve, pressurization", 1));
+p13 = doser.addPlace(new DiscretePlace("open valve, pressurization", 0));
+p14 = doser.addPlace(new DiscretePlace("closed valve, doser fluidization", 1));
+p15 = doser.addPlace(new DiscretePlace("open valve, doser fluidization", 0));
+p16 = doser.addPlace(new DiscretePlace("closed valve, lance fluidization", 1));
+p17 = doser.addPlace(new DiscretePlace("open valve, lance fluidization", 0));
+
+// continuous places
+p18 = doser.addPlace(new DiscretePlace("doser level", 0));
+p19 = doser.addPlace(new DiscretePlace("doser weight", 0));
+p20 = doser.addPlace(new DiscretePlace("doser pressure", 0));
+
+// signals and orders
+p21 = doser.addPlace(new DiscretePlace("start filling, doser", 0));
+p22 = doser.addPlace(new DiscretePlace("filling started, doser", 0));
+p23 = doser.addPlace(new DiscretePlace("open valve, charge", 0));
+p24 = doser.addPlace(new DiscretePlace("open valve, fluidization", 0));
+p25 = doser.addPlace(new DiscretePlace("open valve, discharge", 0));
+p26 = doser.addPlace(new DiscretePlace("stop filling, doser", 0));
+p27 = doser.addPlace(new DiscretePlace("close valve, desaeration", 0));
+p28 = doser.addPlace(new DiscretePlace("close valve, charge", 0));
+p29 = doser.addPlace(new DiscretePlace("close valve, fluidization", 0));
+p30 = doser.addPlace(new DiscretePlace("close valve, discharge", 0));
+p31 = doser.addPlace(new DiscretePlace("enable doser", 0));
+p32 = doser.addPlace(new DiscretePlace("doser OK", 0));
+p33 = doser.addPlace(new DiscretePlace("doser NOT OK", 1));
+
+
+// Transitions
+// valves commands
+t0 = doser.addTransition(new Transition("close valve, desaeration"));
+t1 = doser.addTransition(new Transition("open valve, desaeration" ));
+t2 = doser.addTransition(new TimedTransition("close valve, charge doser", 0.6));
+t3 = doser.addTransition(new TimedTransition("open valve, charge doser", 0.3));
+t4 = doser.addTransition(new TimedTransition("close valve, silo fluidization", 0.3));
+t5 = doser.addTransition(new TimedTransition("open valve, silo fluidization", 0.3));
+t6 = doser.addTransition(new Transition("close valve, discharge silo"));
+t7 = doser.addTransition(new TimedTransition("open valve, discharge silo", 0.5));
+t8 = doser.addTransition(new Transition("close valve, doser pressurization"));
+t9 = doser.addTransition(new Transition("open valve, doser pressurization"));
+t10 = doser.addTransition(new Transition("close valve, relief"));
+t11 = doser.addTransition(new Transition("open valve, relief"));
+t12 = doser.addTransition(new Transition("close valve, pressurization"));
+t13 = doser.addTransition(new Transition("open valve, pressurization"));
+t14 = doser.addTransition(new Transition("close valve, doser fluidization"));
+t15 = doser.addTransition(new Transition("open valve, doser fluidization"));
+t16 = doser.addTransition(new Transition("close valve, lance fluidization"));
+t17 = doser.addTransition(new Transition("open valve, lance fluidization"));
+t18 = doser.addTransition(new Transition("signal OK, doser"));
+t19 = doser.addTransition(new Transition("signal NOT OK, doser"));
+
+// auxiliary commands
+t20 = doser.addTransition(new Transition("signal: high level, doser"));
+t21 = doser.addTransition(new Transition("signal: high weight, doser"));
+t22 = doser.addTransition(new Transition("stop filling, close vales, doser"));
+
+//continuous transitions
+t23 = doser.addTransition(new ContinuousTransition("atmospheric equalization, doser", 1));
+t24 = doser.addTransition(new ContinuousTransition("pressurization, doser", 0.5));
+
+
+// ARCS
+a0 = doser.addArc(new Arc(p21, t1);
