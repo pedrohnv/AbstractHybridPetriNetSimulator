@@ -25,17 +25,32 @@ package hybridPetriNet.Arcs;
 import hybridPetriNet.Places.Place;
 import hybridPetriNet.Transitions.Transition;
 
+/**
+ * This is a test arc.
+ * 
+ * It has the attribute threshold, which is used in the threshold 
+ * disabling function.
+ * 
+ * The weight must be zero.
+ * 
+ * If markings < threshold, the transition is disabled.
+ * 
+ * An inhibitor arc's logic can be made by setting the threshold lower than
+ * zero; unless it is wanted that the threshold be exactly zero. Then
+ * explicitly use an inhibitor arc.
+ */
 public class TestArc extends Arc {
-	/**
-	 * This is an test arc.
-	 * 
-	 * It has the attribute threshold, which is used in the threshold 
-	 * disabling function.
-	 * 
-	 * If markings < threshold, the transition is disabled.
-	 */
 	
 	protected double testThreshold = 1; 
+	
+	public TestArc(Place place, Transition transition, double testThreshold) {
+		super(place, transition, 0.0);
+		this.testThreshold = testThreshold;
+	}
+	
+	public TestArc(Place place, Transition transition) {
+		super(place, transition, 0.0);
+	}
 	
 	public TestArc(String name, Place place, Transition transition) {
 		super(name, place, transition, 0.0);
@@ -47,10 +62,12 @@ public class TestArc extends Arc {
 		this.testThreshold = testThreshold;
 	}
 	
+	/** 
+	 * The test arc disabling function: tests if the markings in the
+	 *  place are SMALLER than a threshold.
+	 */
 	public boolean thresholdDisablingFunction() {
-		/** The test arc disabling function: tests if the markings in the
-		 *  place are SMALLER than a threshold.
-		 */
+
 		boolean disableTransition = false; 
 		
 		if  (this.place.getMarkings() < testThreshold) {
@@ -60,16 +77,15 @@ public class TestArc extends Arc {
 		return disableTransition; 
 	}
 	
-	public boolean finalDisablingFunction() {
-		/**
-		 * this function should take all disabling functions of the arc,
-		 * iterate over them checking if any returns true. If so, the
-		 * transition will be considered disabled (its enabled status will
-		 * be false).
-		 * 
-		 * The final value will be achieved using a boolean OR function.
-		 */
-		
+	/**
+	 * this function should take all disabling functions of the arc,
+	 * iterate over them checking if any returns true. If so, the
+	 * transition will be considered disabled (its enabled status will
+	 * be false).
+	 * 
+	 * The final value will be achieved using a boolean OR function.
+	 */
+	public boolean finalDisablingFunction() {		
 		boolean disableTransition = false;
 		
 		if (this.defaultDisablingFunction()){

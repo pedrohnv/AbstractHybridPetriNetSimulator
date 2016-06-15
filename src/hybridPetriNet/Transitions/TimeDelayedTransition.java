@@ -23,42 +23,42 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 package hybridPetriNet.Transitions;
 
-import hybridPetriNet.MainClass;
+import hybridPetriNet.Evolution;
 
-public class TimedTransition extends Transition {
+/**
+ * This transition is one that fires after a time delay.
+ * The enabled time is updated in the update method, which
+ * should be called at every new time advancement.
+ * 
+ * After enabled for the delay time, it can fire at every ITERATION.
+ * 
+ * new attributes: delayed firing function (the value of the firing function
+ * after the delay has passed), enabled time, delay.
+ * 
+ * Though this transition can function as a normal one (setting the delay
+ * to zero), it is highly discouraged because of the extra code that is
+ * run in the setEnabledStatus and update methods, i.e., greater processing
+ * time in each.
+ */
+public class TimeDelayedTransition extends Transition {
 
-	/**
-	 * This transition is one that fires after a delay.
-	 * The enabled time is updated in the update method, which
-	 * should be called at every new time advancement.
-	 * 
-	 * After enabled for the delay time, it can fire at every ITERATION.
-	 * 
-	 * new attributes: delayed firing function (the value of the firing function
-	 * after the delay has passed), enabled time, delay.
-	 * 
-	 * Though this transition can function as a normal one (setting the delay
-	 * to zero), it is highly discouraged because of the extra code that is
-	 * run in the setEnabledStatus and update methods, i.e., greater processing
-	 * time in each.
-	 */
 	protected double delayedFiringFunction = 1;
 	protected double enabledTime = 0;
 	protected double delay = 1;
 	
-	public TimedTransition(String name) {
+	public TimeDelayedTransition(String name) {
 		super(name);		
 		this.firingFunction = 0.0;
 	}
 
-	public TimedTransition(String name, double delay) {
+	public TimeDelayedTransition(String name, double delay) {
 		super(name);
 		this.delayedFiringFunction = this.firingFunction;
 		this.firingFunction = 0.0;
 		this.delay = delay;
 	}	
 	
-	/**
+	/*
 	 * accessors
 	 */
 	public double getDelayedFiringFunction() {return this.delayedFiringFunction;}
@@ -67,7 +67,7 @@ public class TimedTransition extends Transition {
 	
 	public double getDelay() {return this.delay;}
 	
-	/**
+	/*
 	 * mutators
 	 */
 	public void changeDelayedFiringFunction(double newValue) {
@@ -78,11 +78,11 @@ public class TimedTransition extends Transition {
 	
 	public void changeDelay(double newValue) {
 		this.delay = newValue;}
-	
+
+	/**
+	 *  This method is used inside an arc method.
+	 */
 	public void setEnabledStatus(boolean status) {
-		/**
-		 *  This method is used inside an arc method.
-		 */
 		this.enabledStatus = status;
 		
 		if (! status) { 
@@ -99,7 +99,7 @@ public class TimedTransition extends Transition {
 	 */
 	public void update(){
 		if (this.enabledStatus) {
-		this.enabledTime += MainClass.getTimeStep();
+		this.enabledTime += Evolution.getTimeStep();
 		}
 		
 		if (this.enabledTime >= this.delay) {

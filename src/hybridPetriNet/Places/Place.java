@@ -23,56 +23,43 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 package hybridPetriNet.Places;
 
-import java.util.concurrent.atomic.AtomicInteger;
-
-import hybridPetriNet.MainClass;
-
-public class Place extends MainClass implements PlaceInterface {
-	/** The default place is a continuous place.
-	 * 
-	 * Attributes: name, markings, capacity.
-	 * 
-	 * The markings are doubles.
-	 * 
-	 * The capacity attribute sets both the lower and upper bound
-	 * to the capacity, i.e., the minimum and maximum values the
-	 * markings may have (included).
-	 * capacity = [lower, upper]. Defaults are zero and infinity.
-	 * markings may assume the lower and upper values.
-	 */
-	
-	protected String  name;
-	protected double markings = 0;
-	protected double inf = Double.POSITIVE_INFINITY;
-	protected double[] capacity = {0.0, inf};
+/**
+ * The default place is a discrete place.
+ * 
+ * Attributes: name, markings, capacity.
+ * 
+ * The markings are doubles.
+ * 
+ * The capacity attribute sets both the lower and upper bound
+ * to the capacity, i.e., the minimum and maximum values the
+ * markings may have (included).
+ * capacity = [lower, upper]. Defaults are zero and infinity.
+ * markings may assume the lower and upper values.
+ */
+public class Place extends AbstractPlace {
 		
-	// atomic integer because of multithreading
-	private static AtomicInteger counter = new AtomicInteger(0);
-		
-	private final int index;
-	
-    /** 
+	/* 
      * constructors
      */   
     public Place(String name){
-		this.name = name;
-		this.index = counter.incrementAndGet();
+		super(name);
+		this.markings = 0;
+		this.capacity = new double[] {0.0, Double.POSITIVE_INFINITY};
 	}
 	
-	public Place(String name, double markings){
-		this.name = name;
+	public Place(String name, int markings){
+		super(name);
 		this.markings = markings;
-		this.index = counter.incrementAndGet();
+		this.capacity = new double[] {0.0, Double.POSITIVE_INFINITY};
 	}
 	
-	public Place(String name, double markings, double[] capacity){
-		this.name = name;
+	public Place(String name, int markings, double[] capacity){
+		super(name);
 		this.markings = markings;
-		this.capacity = capacity;
-		this.index = counter.incrementAndGet();
+		this.changeCapacity(capacity); // call mutator
 	}
 	
-	/**
+	/*
 	 * accessors
 	 */
 	public String getName() {return this.name;}
@@ -83,60 +70,54 @@ public class Place extends MainClass implements PlaceInterface {
 	
 	public int getIndex() {return this.index;}
 			
-	/**
+	/*
 	 * class general methods
 	 */	
-	
-	public double newMarkingsValue(double firingFunction, double weight){
-		/**
-		 *  this method returns the new values the markings of a place will
-		 *  have after the firing of a transition.
-		 *  
-		 *  This method does not change the markings of a place. It is 
-		 *  used for testing
-		 */
-		
-		double newMarkingsValue = markings + weight*firingFunction;
-		return newMarkingsValue;
-	}
-	
+	/**
+	 *  this method checks if the new markings will be in the capacity 
+	 *  of the place.
+	 *  
+	 *  As this is a discrete place, the new markings must be an integer.
+	 */	
 	public boolean checkValidMarkings(double newValue){
-		/**
-		 *  this method checks if the new markings will be in the 
-		 *  capacity of the place.
-		 */
-		boolean valid = true;
+		boolean valid = false;
 		
-		if ( (newValue < capacity[0]) || (newValue > capacity[1]) ) {
-			valid = false;
-		}
-		
+		if ( (newValue % 1) == 0 &&
+		(newValue >= this.getCapacity()[0]) && 
+		(newValue <= this.getCapacity()[1]) ){
+			/*
+			 *  if newValue is integer, (newValue % 1) = 0, i.e., the rest 
+			 *  of the integer division will be zero.
+			 */			
+			valid = true;		
+		}			
 		return valid;
 	}
 	
+	/**
+	 *  this method is to override the equals method of an object.
+	 *   It identifies each place by its index.
+	 */
 	@Override
-	public boolean equals(Place other) {
-		/**
-		 *  this method is to override the equals method of an object.
-		 *   It identifies each place by its index.
-		 */
+	public boolean equals(AbstractPlace other) {		
+		
 		boolean equality = false;
 		
-	    if (this.index == other.index) equality = true;
+	    if (this.index == other.index){ equality = true;}
 	    
 	    return equality;
 	}
 	
 	
-	/**
+	/*
 	 * mutators
 	 */
-	public void changeMarkings(double firingFunction, double weight){
-		/** 
-		 * This method changes the markings of a place. It is a mutator.
-		 * 
-		 * It tests if the new value is valid. If not, throws an exception.
-		 */
+	/** 
+	 * This method changes the markings of a place. It is a mutator.
+	 * 
+	 * It tests if the new value is valid. If not, throws an exception.
+	 */
+	public void changeMarkings(double firingFunction, double weight){		
 				
 		double newValue = this.newMarkingsValue(firingFunction, weight);
 						
@@ -156,16 +137,17 @@ public class Place extends MainClass implements PlaceInterface {
 	 * @param newCapacity = [min, max]
 	 * 
 	 * If capacity is a function, it is recommended to implement the logic in
-	 * the main program run.
+	 * the update method.
 	 */
 	public void changeCapacity(double[] newCapacity) {
+	
 		if ((newCapacity.length == 2) && (newCapacity[1] > newCapacity[0]) ){
 			this.capacity = newCapacity;
 			}
 		
 		// throw exception if not of length two, or min > max.
 		else {throw new UnsupportedOperationException(
-				"Invalid capacity length, did not change.");}
+				"Invalid capacity, did not change.");}
 	}
 	
 	/**

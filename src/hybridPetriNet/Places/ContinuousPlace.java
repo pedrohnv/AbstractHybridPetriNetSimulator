@@ -23,44 +23,43 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 package hybridPetriNet.Places;
 
-public class DiscretePlace extends Place {
-
-	/**
+/**
+ * This is a continuous place. Markings may be any real number.
+ */
+public class ContinuousPlace extends Place {	
+	/*
 	 * Constructors
 	 */
-	public DiscretePlace(String name) {
+	public ContinuousPlace(String name) {
 		super(name);
 	}
 
-	public DiscretePlace(String name, int markings) {
-		super(name, markings);
+	public ContinuousPlace(String name, double markings) {
+		super(name);
+		this.markings = markings; // did not call super because it enforces int value to markings.
 	}
 
-	public DiscretePlace(String name, int markings, double[] capacity) {
-		super(name, markings, capacity);
+	public ContinuousPlace(String name, double markings, double[] capacity) {
+		super(name);
+		this.markings = markings;
+		this.changeCapacity(capacity); // call mutator
 	}
 		
-	/**
+	/*
 	 * Object methods
 	 */
+	/**
+	 *  this method checks if the new markings will be in the 
+	 *  capacity of the place.
+	 */
 	public boolean checkValidMarkings(double newValue){
-		/**
-		 *  this method checks if the new markings will be in the capacity 
-		 *  of the place.
-		 *  
-		 *  As this is a discrete place, the new markings must be an integer.
-		 */
+		
 		boolean valid = true;
 		
-		if ( (newValue < this.getCapacity()[0]) || 
-				(newValue > this.getCapacity()[1]) &&
-				( (newValue % 1) != 0) ) {
-			/**
-			 *  if newValue is integer, (newValue % 1) = 0, i.e., the rest 
-			 *  of the integer division will be zero.
-			 */
+		if ( (newValue < capacity[0]) || (newValue > capacity[1]) ) {
 			valid = false;
 		}
+		
 		return valid;
 	}
 	

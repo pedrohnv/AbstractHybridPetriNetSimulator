@@ -23,61 +23,45 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 package hybridPetriNet.Transitions;
 
-import java.util.concurrent.atomic.AtomicInteger;
-
-import hybridPetriNet.MainClass;
-import hybridPetriNet.Places.Place;
-
-public class Transition extends MainClass implements TransitionInterface{
-	/** The default is a default transition.
-	 * 
-	 * A transition is disabled if any disabling function of an arc returns
-	 * true.
-	 * 
-	 * The attributes are: name, firing function, priority, enabled status.
-	 *  
-	 * A situation of conflict arises when the simultaneous firing of two or
-	 * more transitions would cause the markings of a place to go out of its
-	 * capacity. In that case the transitions will fire one by one, in order,
-	 * from the highest priority to the lowest. If multiple transitions have
-	 * the same priority, the one that fires is selected randomly.
-	 * 
-	 * The enabling check of a transition is done in each arc it has connected
-	 * to itself.
-	 */
-	
-	protected String name = "T";
-	protected double firingFunction = 1;
-	protected int priority = 0;
-	protected boolean enabledStatus = true;
-		
-	// atomic integer because of multithreading
-	private static AtomicInteger counter = new AtomicInteger(0);
-
-	private final int index;
-    
-    /**
+/**
+ * The default is a default transition.
+ * 
+ * A transition is disabled if any disabling function of an arc returns
+ * true.
+ * 
+ * The attributes are: name, firing function, priority, enabled status.
+ *  
+ * A situation of conflict arises when the simultaneous firing of two or
+ * more transitions would cause the markings of a place to go out of its
+ * capacity. In that case the transitions will fire one by one, in order,
+ * from the highest priority to the lowest. If multiple transitions have
+ * the same priority, the one that fires is selected randomly.
+ * 
+ * The enabling check of a transition is done in each arc it has connected
+ * to itself.
+ */
+public class Transition extends AbstractTransition {
+	    
+    /*
 	 * constructors
 	 */
 	public Transition (String name) {
-		this.name = name;
-		this.index = counter.incrementAndGet();
+		super(name);
+		this.firingFunction = 1;
 	}
 	
 	public Transition (String name, double firingFunction) {
-		this.name = name;
+		super(name);
 		this.firingFunction = firingFunction;
-		this.index = counter.incrementAndGet();
 	}
 	
 	public Transition (String name, double firingFunction, int priority) {
-		this.name = name;
+		super(name);
 		this.firingFunction = firingFunction;
-		this.index = counter.incrementAndGet();
 		this.priority = priority;
 	}
 	
-	/**
+	/*
 	 * accessors
 	 */
 	public String getName() {return this.name;}
@@ -90,15 +74,15 @@ public class Transition extends MainClass implements TransitionInterface{
 	
 	public boolean getEnabledStatus() {return this.enabledStatus;}
 		
-	/**
+	/*
 	 * mutators
 	 */
+
+	/**
+	 *  This method is used inside an arc method.
+	 */
 	public void setEnabledStatus(boolean status) {
-		/**
-		 *  This method is used inside an arc method.
-		 */
-		this.enabledStatus = status;			
-		
+		this.enabledStatus = status;		
 	}
 	
 	public void changeName(String newName) {this.name = newName;}
@@ -115,33 +99,14 @@ public class Transition extends MainClass implements TransitionInterface{
 		this.firingFunction = newFiringFunction;
 	}
 			
-	/**
+	/*
 	 * class general methods
 	 */	
-	public void fire(Place place, double weight){
-		/**
-		 *  This method fires the transition. That is, changes the markings
-		 *  in a place according to the arc weight and transition's firing
-		 *  function.
-		 */
-		 if (this.enabledStatus) {
-			/**
-			 *  if invalid new marking, exception is thrown.
-			 */
-			 place.changeMarkings(this.firingFunction, weight);			
-		}
-		else {
-			throw new UnsupportedOperationException(
-					"Transition not enabled, did not fire.");
-		}
-	}
-	
-	@Override
-	public boolean equals(Transition other) {
-		/**
-		 *  this method is to override the equals method of an object. It
-		 *  identifies each transition by its index.
-		 */
+	/**
+	 *  this method is to override the equals method of an object. It
+	 *  identifies each transition by its index.
+	 */
+	public boolean equals(AbstractTransition other) {
 		boolean equality = false;
 		
 	    if (this.index == other.index) equality = true;
@@ -149,24 +114,24 @@ public class Transition extends MainClass implements TransitionInterface{
 	    return equality;
 	}
 	
-		
+	/**
+	 * This method is to compare two transitions based on their priority. 
+	 * It is used to solve conflicts between their firing.
+	 * 
+	 * From Java.docs:
+	 * The compareTo method compares the receiving object with the
+	 * specified object and returns a negative integer, 0, or a positive
+	 * integer depending on whether the receiving object is less than,
+	 * equal to, or greater than the specified object, respectively.
+	 * 
+	 * THIS METHOD RETURNS THE INVERSE OF THE STATED ABOVE PURPOSEFULLY!
+	 * This is because this will be used to sort a list of transitions.
+	 * They should be sorted in DESCENDING order, from highest priority to
+	 * lowest.
+	 */
 	@Override
-	public int compareTo(Transition other) {
-		/**
-		 * This method is to compare two transitions based on their priority. 
-		 * It is used to solve conflicts between their firing.
-		 * 
-		 * From Java.docs:
-		 * The compareTo method compares the receiving object with the
-		 * specified object and returns a negative integer, 0, or a positive
-		 * integer depending on whether the receiving object is less than,
-		 * equal to, or greater than the specified object, respectively.
-		 * 
-		 * THIS METHOD RETURNS THE INVERSE OF THE STATED ABOVE PURPOSEFULLY!
-		 * This is because this will be used to sort a list of transitions.
-		 * They should be sorted in DESCENDING order, from highest priority to
-		 * lowest.
-		 */
+	public int compareTo(AbstractTransition other) {
+		
 		if (other == null) throw new NullPointerException(
 				"other transition is null");
 		

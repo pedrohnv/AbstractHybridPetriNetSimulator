@@ -19,41 +19,47 @@ FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR
 COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
 IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
-
  */
 package hybridPetriNet.Arcs;
 
 import hybridPetriNet.Places.Place;
 import hybridPetriNet.Transitions.Transition;
 
+/**
+ * This is an inhibitor arc.
+ * 
+ * It is very similar to a test arc, except that the testing is done if the
+ * markings are greater than a threshold.
+ * 
+ * If markings > threshold, the transition is disabled.
+ */
 public class InhibitorArc extends TestArc {
-	
+
+	public InhibitorArc(Place place, Transition transition, double testThreshold) {
+		super(place, transition, testThreshold);
+	}
+
+	public InhibitorArc(Place place, Transition transition) {
+		super(place, transition);
+	}
+
 	public InhibitorArc(String name, Place place, Transition transition) {
 		super(name, place, transition);
 	}
-	public InhibitorArc(String name, Place place, Transition transition, 
-			double testThreshold) {
+
+	public InhibitorArc(String name, Place place, Transition transition, double testThreshold) {
 		super(name, place, transition, testThreshold);
 	}
-		
-	/**
-	 * This is an inhibitor arc.
-	 * 
-	 * It has the attribute threshold, which is used in the threshold 
-	 * disabling function.
-	 * 
-	 * If markings > threshold, the transition is disabled.
+	
+	/** 
+	 * The inhibitor arc disabling function: tests if the markings in the
+	 *  place are GREATER than a threshold.
 	 */
-	
-	
-	
 	public boolean thresholdDisablingFunction() {
-		/** The test arc disabling function: tests if the markings in the
-		 *  place are GREATER than a threshold.
-		 */
+
 		boolean disableTransition = false; 
 		
-		if ( this.place.getMarkings() > testThreshold) {
+		if  (this.place.getMarkings() > testThreshold) {
 			disableTransition = true;
 		}
 		
