@@ -123,22 +123,24 @@ public class Arc extends AbstractArc {
 			
 			this.transition.setEnabledStatus(false);			
 		}			
-	}
+	}	
 
 	/**
 	 *  This method fires the transition. That is, changes the markings in
 	 *  the place in this arc, according to its weight and transition's
 	 *  firing function.
 	 *  
-	 *  If the transition is enabled, fire.
+	 *  if is a timed transition and is not the first iteration, stop
+	 *  execution.
+	 *  
+	 *  if the transition is enabled, fire; else, throw exception.
 	 */	
 	public void fireTransition() {
 		
-		// if enabled, fire
 		if (this.transition.getEnabledStatus()){
 		
 			this.place.changeMarkings(this.transition.getFiringFunction(),
-				this.weight);
+				this.weight);				
 		}
 	}
 	

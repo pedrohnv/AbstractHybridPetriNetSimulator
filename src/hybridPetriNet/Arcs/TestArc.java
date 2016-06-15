@@ -22,8 +22,8 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 package hybridPetriNet.Arcs;
 
-import hybridPetriNet.Places.Place;
-import hybridPetriNet.Transitions.Transition;
+import hybridPetriNet.Places.AbstractPlace;
+import hybridPetriNet.Transitions.AbstractTransition;
 
 /**
  * This is a test arc.
@@ -43,20 +43,22 @@ public class TestArc extends Arc {
 	
 	protected double testThreshold = 1; 
 	
-	public TestArc(Place place, Transition transition, double testThreshold) {
+	public TestArc(AbstractPlace place, AbstractTransition transition, 
+				double testThreshold) {
 		super(place, transition, 0.0);
 		this.testThreshold = testThreshold;
 	}
 	
-	public TestArc(Place place, Transition transition) {
+	public TestArc(AbstractPlace place, AbstractTransition transition) {
 		super(place, transition, 0.0);
 	}
 	
-	public TestArc(String name, Place place, Transition transition) {
+	public TestArc(String name, AbstractPlace place,
+				AbstractTransition transition) {
 		super(name, place, transition, 0.0);
 	}
 
-	public TestArc(String name, Place place, Transition transition, 
+	public TestArc(String name, AbstractPlace place, AbstractTransition transition, 
 			double testThreshold) {
 		super(name, place, transition, 0.0);
 		this.testThreshold = testThreshold;

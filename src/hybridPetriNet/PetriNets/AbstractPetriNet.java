@@ -61,19 +61,7 @@ public abstract class AbstractPetriNet {
 		this.name = netName;
 		this.index = counter.incrementAndGet();
 	}
-	
-	/**
-	 *  Create empty net with only a name.
-	 */
-	protected AbstractPetriNet(String netName, ArrayList <AbstractPlace> netPlaces, 
-			ArrayList <AbstractTransition> netTransitions, 
-			ArrayList <AbstractArc> netArcs) {
-		placeList = new ArrayList <AbstractPlace>();
-		transitionList = new ArrayList <AbstractTransition>();
-		arcList = new ArrayList <AbstractArc>();
-		this.index = counter.incrementAndGet();
-	}
-	
+
 	/**
 	 *  Create a map of arcs (values, as list) connected to a place
 	 *  (key: place.index).
@@ -94,7 +82,7 @@ public abstract class AbstractPetriNet {
 	 *  This way there is no risk of an arc enabling a transition that
 	 *  was previously disabled by another arc.
 	 */
-	abstract void setEnablings(ArrayList <AbstractArc> listedArcs);
+	abstract void testDisablings(ArrayList <AbstractArc> listedArcs);
 	
 	/**
 	 * Tests for a deadlock. If all transitions are disabled

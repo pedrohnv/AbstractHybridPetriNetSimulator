@@ -60,20 +60,7 @@ public class Transition extends AbstractTransition {
 		this.firingFunction = firingFunction;
 		this.priority = priority;
 	}
-	
-	/*
-	 * accessors
-	 */
-	public String getName() {return this.name;}
-	
-	public double getFiringFunction() {return this.firingFunction;}
-	
-	public int getPriority() {return this.priority;}
-	
-	public int getIndex() {return this.index;}
-	
-	public boolean getEnabledStatus() {return this.enabledStatus;}
-		
+			
 	/*
 	 * mutators
 	 */
@@ -107,5 +94,6 @@ public class Transition extends AbstractTransition {
 	 * properties of the elements at each TIME ADVANCEMENT.
 	 */
 	public void update(){}
+
 		
 }

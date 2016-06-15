@@ -65,6 +65,7 @@ public abstract class SimulationRun {
      *
 	 */
 	protected static PetriNet buildTotalNet(PetriNet ... nets){		
+		
 		ArrayList <AbstractPlace> placeList = new ArrayList <AbstractPlace>();		
 		ArrayList <AbstractTransition> transitionList = new ArrayList <AbstractTransition>();		
 		ArrayList <AbstractArc> arcList = new ArrayList <AbstractArc>();
@@ -118,9 +119,9 @@ public abstract class SimulationRun {
 		 StringBuilder strBuilder = new StringBuilder();
 		 		 
 		 // header
-		 strBuilder.append("AbstractPlace name");
+		 strBuilder.append("Place.name");
 		 strBuilder.append(','); // separator character
-		 strBuilder.append("AbstractPlace index");
+		 strBuilder.append("Place.index");
 		 strBuilder.append(',');
 		 strBuilder.append("Time");
 		 strBuilder.append(',');
@@ -187,8 +188,7 @@ public abstract class SimulationRun {
 	 }
 	 
 	 /**
-	 * Iterate every net. If the max iterations is reached, throw
-	 * exception: livelock.
+	 * Iterate net until max iteration is reached.
 	 * 
 	 * set the iteration to zero and loop.
 	 */
@@ -211,6 +211,8 @@ public abstract class SimulationRun {
 			 */
 			appendResults(parentNet);
 			
+			parentNet.testDeadlock();
+			
 			// if deadlocked, break the for loop, start next time step
 			if (parentNet.isDeadlocked()){
 				break;
@@ -220,7 +222,7 @@ public abstract class SimulationRun {
 	 
 	
 	/**
-	 * Main program run. Enter any number of nets as argument.
+	 * Simulate all nets. Enter any number of nets as argument.
 	 * @param nets
 	 * @throws FileNotFoundException 
 	 */
@@ -243,7 +245,6 @@ public abstract class SimulationRun {
 	
 	/**
 	 * Run the program
-	 * @throws FileNotFoundException
 	 */
 	public static void RunProgram(PetriNet ... nets) {
 		
