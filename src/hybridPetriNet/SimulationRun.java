@@ -257,7 +257,7 @@ public abstract class SimulationRun {
 		
 		// set constants
 		Evolution.setTimeStep(1);
-		Evolution.setMaxIterations(10);
+		Evolution.setMaxIterations(3);
 		Evolution.setFinalTime(0);
 				
 		System.out.println("simulation starting");

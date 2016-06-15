@@ -95,13 +95,13 @@ public class PetriNet extends AbstractPetriNet{
 			this.name = netName;
 		}
 	
-		/**		 * 
-		 * Create a new Petri net from list of places, transitions and arcs.
-		 * Without name
-		 * @param netPlaces
-		 * @param netTransitions
-		 * @param netArcs
-		 */
+	/**
+	 * Create a new Petri net from list of places, transitions and arcs.
+	 * Without name
+	 * @param netPlaces
+	 * @param netTransitions
+	 * @param netArcs
+	 */
 	public PetriNet(ArrayList <Place> netPlaces, 
 			ArrayList <Transition> netTransitions, ArrayList <Arc> netArcs) {
 		placeList = netPlaces;
@@ -212,7 +212,7 @@ public class PetriNet extends AbstractPetriNet{
 			 * Elements with same priority must have random order. 
 			 * 
 			 * Order list of connected transitions to a place by the transitions'
-			 *  priority (descending order).
+			 * priority (descending order).
 			 * This ordering is done after every new arc is added to the map.
 			 * 
 			 * The overridden compareTo() method of the Transition Class assures
@@ -225,14 +225,14 @@ public class PetriNet extends AbstractPetriNet{
 	}
 	
 	/**
-	 *  set enabling of every transition. Will set to false if disabling
+	 *  set enabling of every transition in list. Will set to false if disabling
 	 *  condition is met; no change otherwise.
 	 *  
 	 *  This way there is no risk of an arc enabling a transition that
 	 *  was previously disabled by another arc.
 	 */
-	public void setEnablings() {
-		for (Arc arcInList : this.arcList) {			
+	public void setEnablings(ArrayList <Arc> listedArcs) {
+		for (Arc arcInList : listedArcs) {			
 			arcInList.setTransitionStatus();
 		}			
 	}
@@ -286,6 +286,8 @@ public class PetriNet extends AbstractPetriNet{
 			 */
 			for (Arc placeAssociatedArc : listedArcs) {
 				
+				placeAssociatedArc.setTransitionStatus();
+				
 				try {
 					/*
 					 *  The called method tests if the transition is enabled 
@@ -321,8 +323,8 @@ public class PetriNet extends AbstractPetriNet{
 	 *       order them by the transition's priority in descending order;
 	 *   disable transitions (if condition is met);
 	 *   verify deadlock;
-	 *   fire enabled transitions;
-	 *       solve conflicts, should them arise
+	 *   fire enabled transitions (re-checking the enabling);
+	 *    	solve conflicts, should them arise
 	 */	
 	public void iterateNet() {
 		
@@ -334,7 +336,8 @@ public class PetriNet extends AbstractPetriNet{
 		 */
 		Map<Integer, ArrayList<Arc>> arcsByPlace =  mapArcs(); 
 		
-		this.setEnablings();
+		// check the disabling of every transition
+		this.setEnablings(this.arcList);
 		
 		this.testDeadlock();
 		

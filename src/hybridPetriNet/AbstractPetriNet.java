@@ -47,13 +47,13 @@ public abstract class AbstractPetriNet {
 	abstract void updateElements();
 	
 	/**
-	 *  set enabling of every transition. Will set to false if disabling
+	 *  set enabling of every transition in list. Will set to false if disabling
 	 *  condition is met; no change otherwise.
 	 *  
 	 *  This way there is no risk of an arc enabling a transition that
 	 *  was previously disabled by another arc.
 	 */
-	abstract void setEnablings();
+	abstract void setEnablings(ArrayList <Arc> listedArcs);
 	
 	/**
 	 * Tests for a deadlock. If all transitions are disabled
