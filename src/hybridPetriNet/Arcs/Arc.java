@@ -50,7 +50,30 @@ public class Arc extends AbstractArc{
 	
     /*
 	 * constructors
-	 */		
+	 */
+	/**
+	 * place to transition
+	 * 
+	 * @param place
+	 * @param transition
+	 * @param weight = -1
+	 */
+	public Arc(Place place, Transition transition) {
+		super(place, transition);
+		this.weight = -1;
+	}
+	
+	/**
+	 * transition to place
+	 * @param transition
+	 * @param place
+	 * @param weight = 1
+	 */
+	public Arc(Transition transition, Place place) {
+		super(place, transition);
+		this.weight = 1;
+	}
+	
 	public Arc(Place place, Transition transition, double weight) {
 		super(place, transition);
 		this.weight = weight;
@@ -95,16 +118,17 @@ public class Arc extends AbstractArc{
 		}
 		
 		// put here other disabling functions testing
+		
 		return disableTransition;
 	}
-	
+		
 	/**
-	 *  In the behavior of the net, all transitions will have their enabled
-	 *  status set to TRUE at the end of each iteration (time step). So
-	 *  there is no need to do it here.
-	 *  
 	 *  If there is command to disable, enabled status of transition is
 	 *  set to false.
+	 *  
+	 *  In the behavior of the net, all transitions will have their enabled
+	 *  status set to TRUE at the end of each iteration (time step). So
+	 *  there is no need to do it here.  
 	 */
 	public void setTransitionStatus() {		
 		
@@ -135,46 +159,6 @@ public class Arc extends AbstractArc{
 			throw new UnsupportedOperationException(
 					"Transition disabled, did not fire.");			
 		}
-	}
-	
-	/**
-	 *  this method is to override the equals method of an object. It 
-	 *  identifies each arc by its index.
-	 */
-	@Override
-	public boolean equals(AbstractArc other) {
-		
-		boolean equality = false;
-		
-	    if (this.index == other.index) equality = true;
-	    
-	    return equality;
-	}
-
-	/**
-	 * This method is to compare two arcs based on the priority of their
-	 * transitions. It is used to solve
-	 * conflicts between the firing of the transitions.
-	 * 
-	 * From Java.docs:
-	 * The compareTo method compares the receiving object with the specified
-	 * object and returns a negative integer, 0, or a positive integer 
-	 * depending on whether the receiving object is less than, equal to, or
-	 * greater than the specified object, respectively.
-	 * 
-	 * THE CALLED METHOD RETURNS THE INVERSE of THE STATED ABOVE 
-	 * PURPOSEFULLY! This is because this will be used to sort a list of
-	 *  arcs based on their transitions. They should be sorted in DESCENDING
-	 *  order, from highest priority to lowest.
-	 */
-	@Override
-	public int compareTo(Arc other) {
-		
-		if (other == null) throw new NullPointerException("other arc is null");
-		
-		int comparison = this.transition.compareTo(other.transition);
-		
-		return comparison;
 	}
 	
 	/*

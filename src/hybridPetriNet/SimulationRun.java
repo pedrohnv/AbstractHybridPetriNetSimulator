@@ -25,37 +25,18 @@ package hybridPetriNet;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.PrintWriter;
-import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
-import examples.Robot;
-import hybridPetriNet.Arcs.Arc;
-import hybridPetriNet.Places.Place;
-import hybridPetriNet.Transitions.Transition;
+import examples.Simple;
+import hybridPetriNet.Arcs.AbstractArc;
+import hybridPetriNet.Places.AbstractPlace;
+import hybridPetriNet.Transitions.AbstractTransition;
 
 /**
- * Run the program. The user should define what he wants:
- * see the markings at every iteration and time step, or at
- * a specific time and iteration.
- * 
- * Restrict this to some places, etc.
- * 
- * The Evolution that is extended has the simulations constants and
- * associated methods: time, iteration, time step, max iterations,
- * final time.
- * 
- * In the example below, three separated nets are created:
- * silo, doser, and lance. They are isolated from each other.
- * These are the "lower" nets.
- * 
- * The fourth net, injectionSystem, the "upper" net, makes connections
- * between the lower nets with some additional places and transitions.
- * This makes the Object Orientation Paradigm applied to Petri nets.
- * 
- * It was chosen to watch specific places: "injection pressure" and 
- * "injection flow". Their markings are plotted.
+ * Simulate the Petri nets.
  */
 public abstract class SimulationRun {		
 	
@@ -63,14 +44,16 @@ public abstract class SimulationRun {
 	 * This attribute stores the simulation result as a string.
 	 * It is saved in a CSV file when the simulation ends.
 	 */
-	private static String stringResults;	
+	private static String stringResults;
+	
+	private static String ResultsFileName;
 	
 	/**
 	 * This method takes any number of input nets and makes one
 	 * single net. This way the firings and priorities are guaranteed
 	 * to synchronize.
 	 * 
-	 * Get the lists of arcs, places and transitions of each net
+	 * Get the lists of AbstractArcs, AbstractPlaces and AbstractTransitions of each net
 	 * and build a unified list of each. To remove duplicates:
 	 * 
 	 * Build a set (this object does not accept duplicates) of each.
@@ -81,9 +64,11 @@ public abstract class SimulationRun {
      *
 	 */
 	protected static PetriNet buildTotalNet(PetriNet ... nets){		
-		ArrayList <Place> placeList = new ArrayList <Place>();		
-		ArrayList <Transition> transitionList = new ArrayList <Transition>();		
-		ArrayList <Arc> arcList = new ArrayList <Arc>();
+		ArrayList <AbstractPlace> placeList = new ArrayList <AbstractPlace>();		
+		ArrayList <AbstractTransition> transitionList = new ArrayList <AbstractTransition>();		
+		ArrayList <AbstractArc> arcList = new ArrayList <AbstractArc>();
+		
+		String names = ""; 
 		
 		/*
 		 *  Possible problems with multithreading because arrayList
@@ -95,11 +80,13 @@ public abstract class SimulationRun {
 			placeList.addAll(oneNet.getPlaces());			
 			transitionList.addAll(oneNet.getTransitions());			
 			arcList.addAll(oneNet.getArcs());
+			
+			names += (" + " + oneNet.getName()); 
 		}
 		
-		Set <Place> placeSet = new HashSet<Place>();
-		Set <Transition> transitionSet = new HashSet<Transition>();
-		Set <Arc> arcSet = new HashSet<Arc>();
+		Set <AbstractPlace> placeSet = new HashSet<AbstractPlace>();
+		Set <AbstractTransition> transitionSet = new HashSet<AbstractTransition>();
+		Set <AbstractArc> arcSet = new HashSet<AbstractArc>();
 		
 		placeSet.addAll(placeList);
 		transitionSet.addAll(transitionList);
@@ -113,7 +100,10 @@ public abstract class SimulationRun {
 		transitionList.addAll(transitionSet);			
 		arcList.addAll(arcSet);
 		
-		return (new PetriNet(placeList, transitionList, arcList));
+		// sort AbstractPlace list by AbstractPlace's index, to organize the results
+		Collections.sort(placeList);
+		
+		return (new PetriNet(names , placeList, transitionList, arcList));
 	}
 	
 	/**
@@ -127,9 +117,9 @@ public abstract class SimulationRun {
 		 StringBuilder strBuilder = new StringBuilder();
 		 		 
 		 // header
-		 strBuilder.append("Place name");
+		 strBuilder.append("AbstractPlace name");
 		 strBuilder.append(','); // separator character
-		 strBuilder.append("Place index");
+		 strBuilder.append("AbstractPlace index");
 		 strBuilder.append(',');
 		 strBuilder.append("Time");
 		 strBuilder.append(',');
@@ -152,13 +142,13 @@ public abstract class SimulationRun {
 		 *  it is recommended that StringBuffer be used.	
 		 */
 		StringBuilder strBuilder = new StringBuilder(stringResults);
-		 
-		for (Place place : net.getPlaces()) {
+		
+		for (AbstractPlace AbstractPlace : net.getPlaces()) {
 			 		 
-			strBuilder.append(place.getName());
+			strBuilder.append(AbstractPlace.getName());
 			strBuilder.append(','); // separator character
 			 
-			strBuilder.append(place.getIndex());
+			strBuilder.append(AbstractPlace.getIndex());
 			strBuilder.append(',');
 			 
 			strBuilder.append(Evolution.getTime());
@@ -167,25 +157,28 @@ public abstract class SimulationRun {
 			strBuilder.append(Evolution.getIteration());
 			strBuilder.append(',');
 			 
-			strBuilder.append(place.getMarkings());
+			strBuilder.append(AbstractPlace.getMarkings());
 			strBuilder.append('\n'); // new line character
 		}		 		 
 		stringResults = strBuilder.toString();
 	}
 	
 	/**
-	 * Creates a table with every marking in every place, at a given
+	 * Creates a table with every marking in every AbstractPlace, at a given
 	 * time and iteration.
 	 * @param string to save as csv
 	 */
-	 private static void generateCsvFile(String csvString)
-			 					throws FileNotFoundException{
-		 		 
-		 // get current working directory (of application)
-		 String workingDirectory = Paths.get(".").toAbsolutePath().normalize().toString();
+	 private static void generateCsvFile(String csvString) {
 		 
-		 PrintWriter printWriter = new PrintWriter(new File(workingDirectory +
-				 "Simulation Results.csv"));		 
+		 PrintWriter printWriter = null;
+		 
+		 try {
+			printWriter = new PrintWriter(new File(ResultsFileName + ".csv"));
+		 }
+		 catch (FileNotFoundException e) {
+			e.printStackTrace();
+		 }	
+		 
 		 printWriter.write(csvString);		 
 		 printWriter.close();
 		 
@@ -200,26 +193,28 @@ public abstract class SimulationRun {
 	 */
 	 public static void loopIterate(PetriNet parentNet){
 		    
-			Evolution.setIteration(0);
+		Evolution.setIteration(0);
+		
+		// append initial state
+		appendResults(parentNet);
 			
-			while (Evolution.getIteration() <= Evolution.getMaxIterations()){				
-				/*
-				 *  Append the results from the simulation of the parent net into
-				 *  stringResults attribute.
-				 */
-				appendResults(parentNet);
+		while (Evolution.getIteration() < Evolution.getMaxIterations()){				
+
+			Evolution.updateIteration();
+			
+			parentNet.iterateNet();			
 				
-				parentNet.iterateNet();
-				
-				// if deadlocked, break the for loop, start next time step
-				if (parentNet.isDeadlocked()){
-					
-					System.out.println("net deadlocked");
-					
-					break;
-				}					
-				Evolution.updateIteration();
-			}
+			/*
+			 *  Append the results from the simulation of the parent net into
+			 *  stringResults attribute.
+			 */
+			appendResults(parentNet);
+			
+			// if deadlocked, break the for loop, start next time step
+			if (parentNet.isDeadlocked()){
+				break;
+			}					
+		}
 	 }
 	 
 	
@@ -228,7 +223,7 @@ public abstract class SimulationRun {
 	 * @param nets
 	 * @throws FileNotFoundException 
 	 */
-	public static void simulateNet(PetriNet ... nets) throws FileNotFoundException{
+	public static void simulateNet(PetriNet ... nets) {
 		
 		PetriNet parentNet = buildTotalNet(nets);
 		
@@ -249,15 +244,17 @@ public abstract class SimulationRun {
 	 * Run the program
 	 * @throws FileNotFoundException
 	 */
-	public static void main(String[] args) throws FileNotFoundException {
-		// TODO user: customize the program
+	public static void RunProgram(PetriNet ... nets) {
 		
+				
 		// declare nets
-		PetriNet net = Robot.buildNet();
+		PetriNet parentNet = Simple.buildNet();
+
+		ResultsFileName = parentNet.getName();
 		
 		// set constants
 		Evolution.setTimeStep(1);
-		Evolution.setMaxIterations(3);
+		Evolution.setMaxIterations(10);
 		Evolution.setFinalTime(0);
 				
 		System.out.println("simulation starting");
@@ -265,9 +262,20 @@ public abstract class SimulationRun {
 		stringResults = generateHeader();
 		
 		// call program run
-		SimulationRun.simulateNet(net);
+		SimulationRun.simulateNet(parentNet);
 		
 		System.out.println("simulation ended");
 
+	}
+	
+	/**
+	 * Main execution
+	 */
+	public static void main(String[] args){
+		// TODO user: customize the program run
+		
+		PetriNet net = Simple.buildNet();
+		
+		RunProgram(net);
 	}
 }

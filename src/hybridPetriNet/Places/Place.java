@@ -60,17 +60,6 @@ public class Place extends AbstractPlace {
 	}
 	
 	/*
-	 * accessors
-	 */
-	public String getName() {return this.name;}
-	
-	public double getMarkings() {return this.markings;}
-	
-	public double[] getCapacity() {return this.capacity;}
-	
-	public int getIndex() {return this.index;}
-			
-	/*
 	 * class general methods
 	 */	
 	/**
@@ -93,21 +82,6 @@ public class Place extends AbstractPlace {
 		}			
 		return valid;
 	}
-	
-	/**
-	 *  this method is to override the equals method of an object.
-	 *   It identifies each place by its index.
-	 */
-	@Override
-	public boolean equals(AbstractPlace other) {		
-		
-		boolean equality = false;
-		
-	    if (this.index == other.index){ equality = true;}
-	    
-	    return equality;
-	}
-	
 	
 	/*
 	 * mutators

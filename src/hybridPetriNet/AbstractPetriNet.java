@@ -25,20 +25,61 @@ package hybridPetriNet;
 
 import java.util.ArrayList;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicInteger;
 
-import hybridPetriNet.Arcs.Arc;
+import hybridPetriNet.Arcs.AbstractArc;
+import hybridPetriNet.Places.AbstractPlace;
+import hybridPetriNet.Transitions.AbstractTransition;
 
 /**
  * Define methods the Petri net must have to define its behavior.
  */
 public abstract class AbstractPetriNet {
 	
+	protected String name = "Untitled";
+	
+	// atomic integer because of multithreading
+	private static AtomicInteger counter = new AtomicInteger(0);
+			
+	protected final int index;
+    
+	protected boolean deadlocked = false;
+	
+    /*
+     * Array List because of sorting and shuffling methods
+     */
+	protected ArrayList <AbstractPlace> placeList;
+	
+	protected ArrayList <AbstractTransition> transitionList;
+	
+	protected ArrayList <AbstractArc> arcList;
+	
+	/**
+	 *  Create empty net with only a name.
+	 */
+	protected AbstractPetriNet(String netName) {
+		this.name = netName;
+		this.index = counter.incrementAndGet();
+	}
+	
+	/**
+	 *  Create empty net with only a name.
+	 */
+	protected AbstractPetriNet(String netName, ArrayList <AbstractPlace> netPlaces, 
+			ArrayList <AbstractTransition> netTransitions, 
+			ArrayList <AbstractArc> netArcs) {
+		placeList = new ArrayList <AbstractPlace>();
+		transitionList = new ArrayList <AbstractTransition>();
+		arcList = new ArrayList <AbstractArc>();
+		this.index = counter.incrementAndGet();
+	}
+	
 	/**
 	 *  Create a map of arcs (values, as list) connected to a place
 	 *  (key: place.index).
 	 *  this will be used to solve transition's firing conflicts.
 	 */
-	abstract Map<Integer, ArrayList<Arc>> mapArcs();
+	abstract Map < AbstractTransition, ArrayList<AbstractArc> > mapArcs();
 	
 	/**
 	 * the update method is used to create a function that changes the
@@ -53,7 +94,7 @@ public abstract class AbstractPetriNet {
 	 *  This way there is no risk of an arc enabling a transition that
 	 *  was previously disabled by another arc.
 	 */
-	abstract void setEnablings(ArrayList <Arc> listedArcs);
+	abstract void setEnablings(ArrayList <AbstractArc> listedArcs);
 	
 	/**
 	 * Tests for a deadlock. If all transitions are disabled
@@ -72,7 +113,7 @@ public abstract class AbstractPetriNet {
 	 * to a place (identified by its index). The arcs in each list should be 
 	 * ordered by the transitions' priority. 
 	 */
-	abstract void fireNet(Map<Integer, ArrayList<Arc>> arcsByPlace);
+	abstract void fireNet(Map <AbstractTransition, ArrayList<AbstractArc>> arcsByTransition);
 	
 	/**
 	 *  set all transitions to enabled(true)
@@ -91,4 +132,38 @@ public abstract class AbstractPetriNet {
 	 *       solve conflicts, should them arise
 	 */		
 	abstract void iterateNet();
+	
+
+	/*
+	 * accessors
+	 */
+	/** 
+	 * @return net index
+	 */
+	public int getIndex() { return this.index; }
+	
+	/** 
+	 * @return net name
+	 */
+	public String getName() { return this.name; }
+	
+	/** 
+	 * @return array list of net places
+	 */
+	public ArrayList <AbstractPlace> getPlaces() { return this.placeList; }
+	
+	/** 
+	 * @return array list of net transitions
+	 */
+	public ArrayList <AbstractTransition> getTransitions() {
+		return this.transitionList;
+	}
+	
+	/** 
+	 * @return array list of net arcs
+	 */
+	public ArrayList <AbstractArc> getArcs() { return this.arcList; }
+	
+	public boolean isDeadlocked(){return this.deadlocked;}
+	
 }
