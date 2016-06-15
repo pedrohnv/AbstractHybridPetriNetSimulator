@@ -32,6 +32,7 @@ import java.util.Set;
 
 import examples.Simple;
 import hybridPetriNet.Arcs.AbstractArc;
+import hybridPetriNet.PetriNets.PetriNet;
 import hybridPetriNet.Places.AbstractPlace;
 import hybridPetriNet.Transitions.AbstractTransition;
 

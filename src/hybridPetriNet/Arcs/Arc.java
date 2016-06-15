@@ -23,8 +23,8 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 package hybridPetriNet.Arcs;
 
-import hybridPetriNet.Places.Place;
-import hybridPetriNet.Transitions.Transition;
+import hybridPetriNet.Places.AbstractPlace;
+import hybridPetriNet.Transitions.AbstractTransition;
 
 /** 
  * The default arc is a normal one.
@@ -46,7 +46,7 @@ import hybridPetriNet.Transitions.Transition;
  * Place -> transition, weight < 0;
  * Transition -> place, weight > 0.
  */
-public class Arc extends AbstractArc{
+public class Arc extends AbstractArc {
 	
     /*
 	 * constructors
@@ -58,7 +58,7 @@ public class Arc extends AbstractArc{
 	 * @param transition
 	 * @param weight = -1
 	 */
-	public Arc(Place place, Transition transition) {
+	public Arc(AbstractPlace place, AbstractTransition transition) {
 		super(place, transition);
 		this.weight = -1;
 	}
@@ -69,41 +69,28 @@ public class Arc extends AbstractArc{
 	 * @param place
 	 * @param weight = 1
 	 */
-	public Arc(Transition transition, Place place) {
+	public Arc(AbstractTransition transition, AbstractPlace place) {
 		super(place, transition);
 		this.weight = 1;
 	}
 	
-	public Arc(Place place, Transition transition, double weight) {
+	public Arc(AbstractPlace place, AbstractTransition transition, double weight) {
 		super(place, transition);
 		this.weight = weight;
 	}
 
-	public Arc(String name, Place place, Transition transition,
+	public Arc(String name, AbstractPlace place, AbstractTransition transition,
 			double weight) {
 		super(place, transition);		
 		this.name = name;
 		this.weight = weight;
 	}
-	
-	/*
-	 * accessors
-	 */
-	public String getName() {return this.name;}
-	
-	public Place getPlace() {return this.place;}
-	
-	public Transition getTransition() {return this.transition;}
-	
-	public int getIndex() {return this.index;}
-	
-	public double getWeight() {return this.weight;}
-		
+
 	/*
 	 * class methods
 	 */		
 	/**
-	 * this function should take all disabling functions of the arc,
+	 * This function should take all disabling functions of the arc,
 	 * iterate over them checking if any returns true. If so, the
 	 * transition will be considered disabled (its enabled status will
 	 * be false).
@@ -143,21 +130,15 @@ public class Arc extends AbstractArc{
 	 *  the place in this arc, according to its weight and transition's
 	 *  firing function.
 	 *  
-	 *  if is a timed transition and is not the first iteration, stop
-	 *  execution.
-	 *  
-	 *  if the transition is enabled, fire; else, throw exception.
+	 *  If the transition is enabled, fire.
 	 */	
 	public void fireTransition() {
 		
+		// if enabled, fire
 		if (this.transition.getEnabledStatus()){
 		
 			this.place.changeMarkings(this.transition.getFiringFunction(),
 				this.weight);
-		}
-		else {
-			throw new UnsupportedOperationException(
-					"Transition disabled, did not fire.");			
 		}
 	}
 	
@@ -168,9 +149,9 @@ public class Arc extends AbstractArc{
 		
 	public void changeWeight(double newWeight) {this.weight = newWeight;}
 	
-	public void changePlace(Place newPlace) {this.place = newPlace;}
+	public void changePlace(AbstractPlace newPlace) {this.place = newPlace;}
 	
-	public void changeTransition(Transition newTransition) {
+	public void changeTransition(AbstractTransition newTransition) {
 		this.transition = newTransition;
 	}
 	

@@ -21,7 +21,7 @@ IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
  */
-package hybridPetriNet;
+package hybridPetriNet.PetriNets;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -205,12 +205,12 @@ public class PetriNet extends AbstractPetriNet{
 	 * Fire enabled transitions, by order of priority.
 	 * 
 	 * The input orderedTransitions is a map that lists all arcs connected
-	 * to a transition (identified by its index).
+	 * to a transition.
 	 */
 	public void fireNet(Map <AbstractTransition, ArrayList<AbstractArc>>
 							arcsByTransition){
 		
-		// get ordered (by transition priority) list of arcs.
+		// get ordered (by transition's priority) list of arcs.
 		for (AbstractTransition oneTransition : arcsByTransition.keySet() ) {	
 			
 			ArrayList<AbstractArc> listedArcs = arcsByTransition.get(oneTransition);
@@ -233,7 +233,7 @@ public class PetriNet extends AbstractPetriNet{
 				}
 				catch (UnsupportedOperationException exception){
 					/*
-					 *  Solve conflicts through by-passing all next transitions.
+					 *  Solve conflicts through by-passing all next arcs.
 					 */					
 					continue;					
 				}
@@ -273,7 +273,7 @@ public class PetriNet extends AbstractPetriNet{
 		Map < AbstractTransition, ArrayList<AbstractArc> >
 								arcsByTransition =  mapArcs(); 
 		
-		// check the disabling of every transition
+		// check the disabling of every transition; for deadlock testing
 		this.setEnablings(this.arcList);
 		
 		this.testDeadlock();
