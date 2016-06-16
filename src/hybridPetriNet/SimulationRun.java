@@ -211,7 +211,7 @@ public abstract class SimulationRun {
 			 */
 			appendResults(parentNet);
 			
-			parentNet.testDeadlock();
+			//parentNet.testDeadlock();
 			
 			// if deadlocked, break the for loop, start next time step
 			if (parentNet.isDeadlocked()){
@@ -237,7 +237,7 @@ public abstract class SimulationRun {
 			
 			Evolution.updateTime();
 			
-			parentNet.updateElements();			
+			parentNet.updateElements();
 		}
 		// save simulation results to csv file
 		generateCsvFile(stringResults);

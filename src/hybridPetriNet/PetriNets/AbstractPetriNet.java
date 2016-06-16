@@ -24,7 +24,6 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 package hybridPetriNet.PetriNets;
 
 import java.util.ArrayList;
-import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import hybridPetriNet.Arcs.AbstractArc;
@@ -67,7 +66,7 @@ public abstract class AbstractPetriNet {
 	 *  (key: place.index).
 	 *  this will be used to solve transition's firing conflicts.
 	 */
-	abstract Map < AbstractTransition, ArrayList<AbstractArc> > mapArcs();
+	abstract void mapArcs();
 	
 	/**
 	 * the update method is used to create a function that changes the
@@ -100,8 +99,8 @@ public abstract class AbstractPetriNet {
 	 * The input arcsByPlace is a map that lists all transitions connected
 	 * to a place (identified by its index). The arcs in each list should be 
 	 * ordered by the transitions' priority. 
-	 */
-	abstract void fireNet(Map <AbstractTransition, ArrayList<AbstractArc>> arcsByTransition);
+	 */	
+	abstract void fireNet();
 	
 	/**
 	 *  set all transitions to enabled(true)

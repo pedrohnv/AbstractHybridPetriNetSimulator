@@ -45,7 +45,13 @@ import hybridPetriNet.Transitions.TimeDelayedTransition;
  * the external places (or maybe transitions, no restrictions to that here).
  */
 public class PetriNet extends AbstractPetriNet{
-		
+	
+	/**
+	 *  Map of transitions (key) to list of places that contains it (values).
+	 */
+	private Map < AbstractTransition, ArrayList<AbstractArc> > arcsMap = 
+				new HashMap < AbstractTransition, ArrayList<AbstractArc> >();
+	
 	/*
 	 * constructors
 	 */
@@ -105,66 +111,44 @@ public class PetriNet extends AbstractPetriNet{
 	public void changeName(String name) {this.name = name;}
 	
 	/*
-	 * Behavior methods
-	 * Each of the below methods uses the one above.
+	 * General and behavior methods
 	 */	
+
 	/**
-	 *  Create a map of arcs (values, as list) connected to a transition
-	 *  (key: transition).
-	 *  
-	 *  This will be used to solve transition's firing conflicts.
+	 * Calls the fireTransition in all arcs that contain a transition.
+	 * @param arcsWithTransition
 	 */
-	public Map < AbstractTransition, ArrayList<AbstractArc> > mapArcs() {
+	public void fireByArcs(ArrayList <AbstractArc> arcsWithTransition){
 		
-		Map < AbstractTransition, ArrayList<AbstractArc> > orderedTransitions = 
-				new HashMap < AbstractTransition, ArrayList<AbstractArc> >();
-		
-		// a key in the map
-		AbstractTransition key;
-		
-		/*
-		 *  This loop sets the keys (transition indexes) to the map, each with
-		 *  empty corresponding values (no places yet).
-		 */
-		for (AbstractTransition transitionInList : this.transitionList) {			
-			key = transitionInList;
-			
-			orderedTransitions.put(key, new ArrayList <AbstractArc>());
-		}
-						
-		/*
-		 *  Add values to the map;
-		 *  
-		 *  Loop through all arcs. Get the transition index (a key) and add
-		 *  the place to the map.
-		 */		
-		for (AbstractArc arcInList : this.arcList) {			
-			
-			key = arcInList.getTransition();
-			
-			orderedTransitions.get(key).add(arcInList);
-			
-			/*
-			 * Shuffle list, then sort. Because, in sorting, equal elements
-			 * will be in the same order (their position in the array do
-			 * not change in the sorting when they are equivalent).
-			 * 
-			 * Elements with same priority must have random order. 
-			 * 
-			 * Order list of connected transitions to a place by the 
-			 * transitions' priority (descending order).
-			 * This ordering is done after every new transition is added to
-			 * the map.
-			 * 
-			 * The overridden compareTo() method of the Transition Class
-			 * assures this descending order implementation.
-			 */						
-			Collections.shuffle( orderedTransitions.get(key) );
-			Collections.sort( orderedTransitions.get(key) );
-		}
-		return orderedTransitions;
+		for (AbstractArc arc : arcsWithTransition){
+			arc.fireTransition();	
+		}		
 	}
-		
+	
+	/**
+	 * Shuffle then sort list of transitions of the net. Call this before
+	 * each firing.
+	 */
+	public void orderTransitions() {
+		/*
+		 * Shuffle list, then sort. Because in sorting, equal elements
+		 * will be in the same order (their position in the array do
+		 * not change in the sorting when they are equivalent).
+		 * 
+		 * Elements with same priority must have random order. 
+		 * 
+		 * Order list of transitions by their priority (in descending order).
+		 * 
+		 * This ordering must be done at each iteration (the priorities may
+		 * change), before the firing of the net.
+		 * 
+		 * The overridden compareTo() method of the Transition Class
+		 * assures this descending order implementation.
+		 */		
+		Collections.shuffle(this.transitionList);
+		Collections.sort(this.transitionList);
+	}
+	
 	/**
 	 *  set enabling of every transition in list. Will set to false if disabling
 	 *  condition is met; no change otherwise.
@@ -177,75 +161,57 @@ public class PetriNet extends AbstractPetriNet{
 			arcInList.setTransitionStatus();
 		}			
 	}
-			
+	
 	/**
-	 * Fire enabled transitions, checking for new disabling conditions.
+	 * Populate the arcsMap with arcs (values) that contains a transition (key).
 	 */
-	public void fireNet(Map <AbstractTransition, ArrayList<AbstractArc>>
-					arcsByTransition){
+	public void mapArcs() {
+				
+		// a key in the arcsMap
+		AbstractTransition key;
 		
-		ArrayList <AbstractArc> ArcsWithTransition;
-		
-		for (AbstractTransition oneTransition : arcsByTransition.keySet()){
+		/*
+		 *  This loop set the keys (transition) to the map, each with
+		 *  empty corresponding values (no arcs yet).
+		 */
+		for (AbstractTransition transitionInList : this.transitionList) {			
+			key = transitionInList;
 			
-			// get list of arcs connected to a transition
-			ArcsWithTransition = arcsByTransition.get(oneTransition);
-			
-			// disable transition if the condition is met in at least one arc 
-			testDisablings(ArcsWithTransition);
-			
-			if (oneTransition.getEnabledStatus()){
-				// fire transition, changing all markings in the associated places				
-				for (AbstractArc arc : ArcsWithTransition){
-					arc.fireTransition();
-				}
-			}			
+			arcsMap.put(key, new ArrayList <AbstractArc>());
 		}
-		
+						
+		/*
+		 *  Add values to the map;
+		 *  
+		 *  Loop through all arcs, get its transition (key) and add the arc to
+		 *  the map.
+		 */		
+		for (AbstractArc arcInList : this.arcList) {			
+			
+			key = arcInList.getTransition();
+			
+			arcsMap.get(key).add(arcInList);
+		}
 	}
 	
 	/**
-	 * OLD
-	 * Fire enabled transitions, by place and order of priority.
+	 * Fire transitions (by priority), testing for disabling in each new
+	 * transition.
 	 * 
-	 * The input arcsByPlace is a map that lists all transitions connected
-	 * to a place (identified by its index). The arcs in each list should be 
-	 * ordered by the transitions' priority. 
+	 * Conflicting situations should be solved naturally by doing it that way.
 	 */
-	public void fireNetOLD(Map <AbstractTransition, ArrayList<AbstractArc>>
-										arcsByTransition){
-		/*
-		 *  get ordered (by transition priority) list of arcs associated to
-		 *   a single place
-		 */
-		for (AbstractTransition transition : arcsByTransition.keySet() ) {			
-			ArrayList <AbstractArc> listedArcs = arcsByTransition.get(transition);
+	public void fireNet(){
+		for (AbstractTransition transition : this.transitionList) {
 			
-			/*
-			 * Fire every transition.
-			 * 
-			 *  if invalid new marking, exception is thrown.
-			 */
-			for (AbstractArc transitionAssociatedArc : listedArcs) {
-				
-				try {
-					/*
-					 *  The called method tests if the transition is enabled 
-					 *  before firing, for redundancy.
-					 */
-					transitionAssociatedArc.fireTransition();					
-				}
-				catch (UnsupportedOperationException exception){
-					/*
-					 *  Solve conflicts through by-passing all next transitions.
-					 */
-					continue;					
-				}
+			testDisablings(arcsMap.get(transition));
+			
+			// if enabled, fire
+			if (transition.getEnabledStatus()){
+				fireByArcs(arcsMap.get(transition));
 			}
 		}
 	}
-
-
+	
 	/**
 	 * Tests for a deadlock. If all transitions are disabled
 	 * (enabledStatus = false), then flag a deadlock.
@@ -287,37 +253,19 @@ public class PetriNet extends AbstractPetriNet{
 	/** 
 	 * The iterate method does one iteration over the net:
 	 *   enable all transitions;
-	 *   group arcs by place
-	 *       order them by the transition's priority in descending order;
-	 *   disable transitions (if condition is met);
-	 *   verify deadlock;
-	 *   fire enabled transitions (re-checking the enabling);
-	 *    	solve conflicts, should them arise
+	 *   order transitions;
+	 *   map arcs;
+	 *   fire net;
 	 */	
 	public void iterateNet() {
 		
 		this.enableAllTransitions();
 		
-		/*
-		 * The mapping must be done at every iteration because the priorities 
-		 * of the transitions may change.
-		 */
-		Map < AbstractTransition, ArrayList<AbstractArc> >
-								arcsByTransition =  mapArcs(); 
+		this.orderTransitions();
 		
-		// check the disabling of every transition; for deadlock testing
-		this.testDisablings(this.arcList);
+		this.mapArcs();
 		
-		this.testDeadlock();
-		
-		if (! this.deadlocked){
-			// net is NOT deadlocked
-			// do the firing by priority of the transitions
-			this.fireNet(arcsByTransition);
-		}
-		else {
-			System.out.println("deadlocked");
-		}
+		this.fireNet();
 	}
 	
 	public void updateElements() {
@@ -332,4 +280,5 @@ public class PetriNet extends AbstractPetriNet{
 			arc.update();
 		}
 	}
+
 }
