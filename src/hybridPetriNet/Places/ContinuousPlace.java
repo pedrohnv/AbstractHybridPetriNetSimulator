@@ -30,15 +30,33 @@ public class ContinuousPlace extends Place {
 	/*
 	 * Constructors
 	 */
+	/**
+	 * 
+	 * @param name
+	 * @param markings = 0
+	 * @param capacity = [0, +inf]
+	 */
 	public ContinuousPlace(String name) {
 		super(name);
 	}
 
+	/**
+	 * 
+	 * @param name
+	 * @param markings
+	 * @param capacity = [0, +inf]
+	 */
 	public ContinuousPlace(String name, double markings) {
 		super(name);
 		this.markings = markings; // did not call super because it enforces int value to markings.
 	}
 
+	/**
+	 * 
+	 * @param name
+	 * @param markings
+	 * @param capacity
+	 */
 	public ContinuousPlace(String name, double markings, double[] capacity) {
 		super(name);
 		this.markings = markings;

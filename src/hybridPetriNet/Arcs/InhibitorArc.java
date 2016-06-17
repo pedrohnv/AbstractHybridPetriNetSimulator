@@ -35,20 +35,46 @@ import hybridPetriNet.Transitions.AbstractTransition;
  */
 public class InhibitorArc extends TestArc {
 
+	/**
+	 * 
+	 * @param place
+	 * @param transition
+	 * @param testThreshold
+	 */
 	public InhibitorArc(AbstractPlace place, AbstractTransition transition,
 							double testThreshold) {
 		super(place, transition, testThreshold);
 	}
 
+	/**
+	 * 
+	 * @param place
+	 * @param transition
+	 * @param testThresold = 1
+	 */
 	public InhibitorArc(AbstractPlace place, AbstractTransition transition) {
 		super(place, transition);
 	}
 
+	/**
+	 * 
+	 * @param name
+	 * @param place
+	 * @param transition
+	 * @param testThresold = 1
+	 */
 	public InhibitorArc(String name, AbstractPlace place,
 			AbstractTransition transition) {
 		super(name, place, transition);
 	}
 
+	/**
+	 * 
+	 * @param name
+	 * @param place
+	 * @param transition
+	 * @param testThreshold
+	 */
 	public InhibitorArc(String name, AbstractPlace place,
 			AbstractTransition transition, double testThreshold) {
 		super(name, place, transition, testThreshold);

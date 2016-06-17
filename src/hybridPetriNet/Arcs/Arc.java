@@ -67,81 +67,35 @@ public class Arc extends AbstractArc {
 	 * transition to place
 	 * @param transition
 	 * @param place
-	 * @param weight = 1
+	 * @param weight = +1
 	 */
 	public Arc(AbstractTransition transition, AbstractPlace place) {
 		super(place, transition);
 		this.weight = 1;
 	}
-	
+	/**
+	 * 
+	 * @param place
+	 * @param transition
+	 * @param weight
+	 */
 	public Arc(AbstractPlace place, AbstractTransition transition, double weight) {
 		super(place, transition);
 		this.weight = weight;
 	}
 
+	/**
+	 * 
+	 * @param name
+	 * @param place
+	 * @param transition
+	 * @param weight
+	 */
 	public Arc(String name, AbstractPlace place, AbstractTransition transition,
 			double weight) {
 		super(place, transition);		
 		this.name = name;
 		this.weight = weight;
-	}
-
-	/*
-	 * class methods
-	 */		
-	/**
-	 * This function should take all disabling functions of the arc,
-	 * iterate over them checking if any returns true. If so, the
-	 * transition will be considered disabled (its enabled status will
-	 * be false).
-	 * 
-	 * The final value will be achieved using a boolean OR function.
-	 */
-	public boolean finalDisablingFunction() {		
-		boolean disableTransition = false;
-		
-		if (this.defaultDisablingFunction()){
-			disableTransition = true;					
-		}
-		
-		// put here other disabling functions testing
-		
-		return disableTransition;
-	}
-		
-	/**
-	 *  If there is command to disable, enabled status of transition is
-	 *  set to false.
-	 *  
-	 *  In the behavior of the net, all transitions will have their enabled
-	 *  status set to TRUE at the end of each iteration (time step). So
-	 *  there is no need to do it here.  
-	 */
-	public void setTransitionStatus() {		
-		
-		if (this.finalDisablingFunction()) {		
-			
-			this.transition.setEnabledStatus(false);			
-		}			
-	}	
-
-	/**
-	 *  This method fires the transition. That is, changes the markings in
-	 *  the place in this arc, according to its weight and transition's
-	 *  firing function.
-	 *  
-	 *  if is a timed transition and is not the first iteration, stop
-	 *  execution.
-	 *  
-	 *  if the transition is enabled, fire; else, throw exception.
-	 */	
-	public void fireTransition() {
-		
-		if (this.transition.getEnabledStatus()){
-		
-			this.place.changeMarkings(this.transition.getFiringFunction(),
-				this.weight);				
-		}
 	}
 	
 	/*
@@ -162,4 +116,5 @@ public class Arc extends AbstractArc {
 	 * properties of the elements at each TIME ADVANCEMENT.
 	 */
 	public void update(){}
+	
 }

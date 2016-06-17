@@ -42,21 +42,100 @@ import hybridPetriNet.Evolution;
  */
 public class TimeDelayedTransition extends Transition {
 
+	/**
+	 * New value of firing function after delayed time has passed
+	 */
 	protected double delayedFiringFunction = 1;
+	
+	/**
+	 * How much time the transition is enabled
+	 */
 	protected double enabledTime = 0;
+	
+	/**
+	 * How much time must be enabled before switching to new firing function
+	 */
 	protected double delay = 1;
 	
+	/**
+	 * 
+	 * @param name
+	 * @param priority = 1
+	 * @param firingFunction = 0
+	 * @param delayedFiringFunction = 1
+	 * @param delay = 1
+	 */
 	public TimeDelayedTransition(String name) {
 		super(name);		
 		this.firingFunction = 0.0;
 	}
 
+	/**
+	 * 
+	 * @param name
+	 * @param delay
+	 * @param priority = 1
+	 * @param firingFunction = 0
+	 * @param delayedFiringFunction = 1
+	 */
 	public TimeDelayedTransition(String name, double delay) {
 		super(name);
 		this.delayedFiringFunction = this.firingFunction;
 		this.firingFunction = 0.0;
 		this.delay = delay;
 	}	
+	
+	/**
+	 * 
+	 * @param name
+	 * @param delay
+	 * @param delayedFiringFunction
+	 * @param priority = 1
+	 * @param firingFunction = 0
+	 */
+	public TimeDelayedTransition(String name, double delay, 
+				double delayedFiringFunction) {
+		super(name);
+		this.delayedFiringFunction = this.firingFunction;
+		this.firingFunction = 0.0;
+		this.delay = delay;
+	}
+	
+	/**
+	 * 
+	 * @param name
+	 * @param delay
+	 * @param delayedFiringFunction
+	 * @param priority
+	 * @param firingFunction = 0
+	 */
+	public TimeDelayedTransition(String name, double delay, 
+				double delayedFiringFunction, int priority) {
+		super(name);
+		this.delayedFiringFunction = this.firingFunction;
+		this.firingFunction = 0.0;
+		this.delay = delay;
+		this.priority = priority;
+	}
+	
+	/**
+	 * Constructor for when a transition that fires as normal, then change the 
+	 * firing speed after a delayed time.
+	 * @param name
+	 * @param delay
+	 * @param delayedFiringFunction
+	 * @param priority
+	 * @param firingFunction
+	 */
+	public TimeDelayedTransition(String name, double delay, 
+				double delayedFiringFunction, int priority,
+				double firingFunction) {
+		super(name);
+		this.delayedFiringFunction = this.firingFunction;
+		this.firingFunction = 0.0;
+		this.delay = delay;
+		this.priority = priority;
+	}
 	
 	/*
 	 * accessors

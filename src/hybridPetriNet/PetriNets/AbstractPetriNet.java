@@ -24,6 +24,8 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 package hybridPetriNet.PetriNets;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import hybridPetriNet.Arcs.AbstractArc;
@@ -44,6 +46,13 @@ public abstract class AbstractPetriNet {
     
 	protected boolean deadlocked = false;
 	
+	/**
+	 * The places are the keys.
+	 * The values are a list of arcs that contains the place
+	 */
+	protected Map < AbstractPlace, ArrayList<AbstractArc> > arcsMap = 
+			new HashMap < AbstractPlace, ArrayList<AbstractArc> >();
+		
     /*
      * Array List because of sorting and shuffling methods
      */
@@ -61,10 +70,42 @@ public abstract class AbstractPetriNet {
 		this.index = counter.incrementAndGet();
 	}
 
+	/*
+	 * mutators
+	 */
+	 /** 
+	 * Add a single place to created net.
+	 */
+	public void addPlace(AbstractPlace onePlace) {
+		this.placeList.add(onePlace);
+	}
+	
+	 /** 
+	 * Add a single transition to created net.
+	 */
+	public void addTransition(AbstractTransition oneTransition) {
+		this.transitionList.add(oneTransition);
+	}
+	
+	/** 
+	 * Add a single arc to created net.
+	 */
+	public void addArc(AbstractArc oneArc) {
+		this.arcList.add(oneArc);
+	}
+	
 	/**
-	 *  Create a map of arcs (values, as list) connected to a place
-	 *  (key: place.index).
-	 *  this will be used to solve transition's firing conflicts.
+	 * Change the name of the net.
+	 * @param name
+	 */
+	public void changeName(String name) {this.name = name;}
+		
+	/*
+	 * General methods 
+	 */
+	/**
+	 *  Populate the map.
+	 *  This will be used to solve transition's firing conflicts.
 	 */
 	abstract void mapArcs();
 	
@@ -81,7 +122,7 @@ public abstract class AbstractPetriNet {
 	 *  This way there is no risk of an arc enabling a transition that
 	 *  was previously disabled by another arc.
 	 */
-	abstract void testDisablings(ArrayList <AbstractArc> listedArcs);
+	abstract void testDisablings();
 	
 	/**
 	 * Tests for a deadlock. If all transitions are disabled
@@ -94,11 +135,7 @@ public abstract class AbstractPetriNet {
 	abstract void testDeadlock();
 	
 	/**
-	 * Fire enabled transitions, by place and order of priority.
-	 * 
-	 * The input arcsByPlace is a map that lists all transitions connected
-	 * to a place (identified by its index). The arcs in each list should be 
-	 * ordered by the transitions' priority. 
+	 * Fire enabled transitions.
 	 */	
 	abstract void fireNet();
 	
@@ -112,11 +149,8 @@ public abstract class AbstractPetriNet {
 	/** 
 	 * The iterate method does one iteration over the net:
 	 *   enable all transitions;
-	 *   group arcs by place
-	 *       order them by the transition's priority in descending order;
-	 *   disable transitions (if condition is met);
+	 *   disable transitions (if condition is met, also solving conflicts);
 	 *   fire enabled transitions;
-	 *       solve conflicts, should them arise
 	 */		
 	abstract void iterateNet();
 	

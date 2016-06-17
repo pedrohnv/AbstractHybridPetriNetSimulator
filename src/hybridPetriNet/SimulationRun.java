@@ -30,7 +30,6 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
-import examples.Simple;
 import hybridPetriNet.Arcs.AbstractArc;
 import hybridPetriNet.PetriNets.PetriNet;
 import hybridPetriNet.Places.AbstractPlace;
@@ -48,6 +47,14 @@ public abstract class SimulationRun {
 	private static String stringResults;
 	
 	private static String ResultsFileName;
+	
+	/**
+	 * Define the name of the file (csv) that is created with the results saved.
+	 * @param name
+	 */
+	public static void setResultsFileName(String name) {
+		SimulationRun.ResultsFileName = name;
+	}
 	
 	/**
 	 * This method takes any number of input nets and makes one
@@ -82,8 +89,6 @@ public abstract class SimulationRun {
 			placeList.addAll(oneNet.getPlaces());			
 			transitionList.addAll(oneNet.getTransitions());			
 			arcList.addAll(oneNet.getArcs());
-			
-			names += (" + " + oneNet.getName()); 
 		}
 		
 		Set <AbstractPlace> placeSet = new HashSet<AbstractPlace>();
@@ -184,7 +189,7 @@ public abstract class SimulationRun {
 		 printWriter.write(csvString);		 
 		 printWriter.close();
 		 
-		 System.out.println("csv file created");
+		 System.out.println("csv file created: " + ResultsFileName);
 	 }
 	 
 	 /**
@@ -195,28 +200,27 @@ public abstract class SimulationRun {
 	 public static void loopIterate(PetriNet parentNet){
 		    
 		Evolution.setIteration(0);
-		
-		// append initial state
-		appendResults(parentNet);
 			
 		while (Evolution.getIteration() < Evolution.getMaxIterations()){				
-
-			Evolution.updateIteration();
 			
-			parentNet.iterateNet();			
-				
+			Evolution.updateIteration();
+						
+			//parentNet.testDeadlock();
+						
+			// if deadlocked, break the loop, stop simulation
+			if (parentNet.isDeadlocked()){
+				System.out.println("deadlocked");
+				break;
+			}	
+			
+			parentNet.iterateNet();		
+							
 			/*
 			 *  Append the results from the simulation of the parent net into
 			 *  stringResults attribute.
 			 */
 			appendResults(parentNet);
-			
-			//parentNet.testDeadlock();
-			
-			// if deadlocked, break the for loop, start next time step
-			if (parentNet.isDeadlocked()){
-				break;
-			}					
+							
 		}
 	 }
 	 
@@ -229,55 +233,42 @@ public abstract class SimulationRun {
 	public static void simulateNet(PetriNet ... nets) {
 		
 		PetriNet parentNet = buildTotalNet(nets);
+
+		// append initial state
+		appendResults(parentNet);
 		
 		// will run until the final time is reached
 		while(Evolution.getTime() <= Evolution.getFinalTime()) {
+			
+			if (parentNet.isDeadlocked()){
+				// if deadlocked, stop simulation
+				break;
+			}
 			
 			loopIterate(parentNet);
 			
 			Evolution.updateTime();
 			
 			parentNet.updateElements();
-		}
+		}		
 		// save simulation results to csv file
-		generateCsvFile(stringResults);
+		generateCsvFile(stringResults);		
 	}
 	
 	/**
 	 * Run the program
 	 */
-	public static void RunProgram(PetriNet ... nets) {
+	public static void RunProgram(PetriNet ... nets) {			
 		
-				
-		// declare nets
-		PetriNet parentNet = Simple.buildNet();
-
-		ResultsFileName = parentNet.getName();
-		
-		// set constants
-		Evolution.setTimeStep(1);
-		Evolution.setMaxIterations(10);
-		Evolution.setFinalTime(0);
-				
 		System.out.println("simulation starting");
 		
-		stringResults = generateHeader();
+		SimulationRun.stringResults = generateHeader();
 		
 		// call program run
-		SimulationRun.simulateNet(parentNet);
+		SimulationRun.simulateNet(nets);
 		
 		System.out.println("simulation ended");
 
 	}
 	
-	/**
-	 * Main execution
-	 */
-	public static void main(String[] args){
-		// TODO user: customize the program run
-		
-		PetriNet net = Simple.buildNet();
-		
-		RunProgram(net);
-	}
 }

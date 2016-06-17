@@ -43,21 +43,44 @@ public class TestArc extends Arc {
 	
 	protected double testThreshold = 1; 
 	
+	/** 
+	 * @param place
+	 * @param transition
+	 * @param testThreshold
+	 */
 	public TestArc(AbstractPlace place, AbstractTransition transition, 
 				double testThreshold) {
 		super(place, transition, 0.0);
 		this.testThreshold = testThreshold;
 	}
-	
+	/**	
+	 * @param place
+	 * @param transition
+	 * @param testThresold = 1
+	 */
 	public TestArc(AbstractPlace place, AbstractTransition transition) {
 		super(place, transition, 0.0);
 	}
 	
+	/**
+	 * 
+	 * @param name
+	 * @param place
+	 * @param transition
+	 * @param testThresold = 1
+	 */
 	public TestArc(String name, AbstractPlace place,
 				AbstractTransition transition) {
 		super(name, place, transition, 0.0);
 	}
 
+	/**
+	 * 
+	 * @param name
+	 * @param place
+	 * @param transition
+	 * @param testThreshold
+	 */
 	public TestArc(String name, AbstractPlace place, AbstractTransition transition, 
 			double testThreshold) {
 		super(name, place, transition, 0.0);

@@ -25,9 +25,8 @@ package hybridPetriNet.PetriNets;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
 
+import hybridPetriNet.Evolution;
 import hybridPetriNet.Arcs.AbstractArc;
 import hybridPetriNet.Places.AbstractPlace;
 import hybridPetriNet.Transitions.AbstractTransition;
@@ -46,17 +45,12 @@ import hybridPetriNet.Transitions.TimeDelayedTransition;
  */
 public class PetriNet extends AbstractPetriNet{
 	
-	/**
-	 *  Map of transitions (key) to list of places that contains it (values).
-	 */
-	private Map < AbstractTransition, ArrayList<AbstractArc> > arcsMap = 
-				new HashMap < AbstractTransition, ArrayList<AbstractArc> >();
-	
 	/*
 	 * constructors
 	 */
 	/**
 	 *  Create empty net with only a name.
+	 *  @param name
 	 */
 	public PetriNet(String netName) {
 		super(netName);
@@ -81,72 +75,75 @@ public class PetriNet extends AbstractPetriNet{
 	}
 	
 	/*
-	 * mutators
-	 */
-	 /** 
-	 * Add a single place to created net.
-	 */
-	public void addPlace(AbstractPlace onePlace) {
-		this.placeList.add(onePlace);
-	}
-	
-	 /** 
-	 * Add a single transition to created net.
-	 */
-	public void addTransition(AbstractTransition oneTransition) {
-		this.transitionList.add(oneTransition);
-	}
-	
-	/** 
-	 * Add a single arc to created net.
-	 */
-	public void addArc(AbstractArc oneArc) {
-		this.arcList.add(oneArc);
-	}
-	
-	/**
-	 * Change the name of the net.
-	 * @param name
-	 */
-	public void changeName(String name) {this.name = name;}
-	
-	/*
 	 * General and behavior methods
-	 */	
-
+	 */		
 	/**
-	 * Calls the fireTransition in all arcs that contain a transition.
-	 * @param arcsWithTransition
+	 * Disable conflicting transitions.
+	 * @param place
+	 * @param listedArcs
 	 */
-	public void fireByArcs(ArrayList <AbstractArc> arcsWithTransition){
+	private void disableConflictingTransitions(AbstractPlace place,
+										ArrayList <AbstractArc> listedArcs){
 		
-		for (AbstractArc arc : arcsWithTransition){
-			arc.fireTransition();	
-		}		
+		double markingsAfterFiring = place.getMarkings();
+				
+		for (AbstractArc arc : listedArcs){
+						
+			AbstractTransition transition = arc.getTransition();
+						
+			markingsAfterFiring += ( transition.getFiringFunction() * arc.getWeight() );
+					
+			// if not valid, disable
+			if (! place.checkValidMarkings(markingsAfterFiring)){
+				transition.setEnabledStatus(false);
+			}
+		}
 	}
 	
 	/**
-	 * Shuffle then sort list of transitions of the net. Call this before
-	 * each firing.
+	 * Loop through all places and check if, after a firing, the markings in
+	 * the place goes invalid. If yes, disable transition.
 	 */
-	public void orderTransitions() {
-		/*
-		 * Shuffle list, then sort. Because in sorting, equal elements
-		 * will be in the same order (their position in the array do
-		 * not change in the sorting when they are equivalent).
-		 * 
-		 * Elements with same priority must have random order. 
-		 * 
-		 * Order list of transitions by their priority (in descending order).
-		 * 
-		 * This ordering must be done at each iteration (the priorities may
-		 * change), before the firing of the net.
-		 * 
-		 * The overridden compareTo() method of the Transition Class
-		 * assures this descending order implementation.
-		 */		
-		Collections.shuffle(this.transitionList);
-		Collections.sort(this.transitionList);
+	private void identifyAndSolveConflicts(){
+		
+		for (AbstractPlace place : this.placeList){
+			
+			ArrayList <AbstractArc> negativeWeightArcs =
+												new ArrayList <AbstractArc>();
+			
+			ArrayList <AbstractArc> positiveWeightArcs =
+												new ArrayList <AbstractArc>();
+					
+			// make two lists of arcs, ignore zero weight arcs
+			for (AbstractArc arc : arcsMap.get(place)){
+				if (arc.getWeight() < 0){
+					negativeWeightArcs.add(arc);
+				}
+				else if (arc.getWeight() > 0){
+					positiveWeightArcs.add(arc);
+				}
+			}
+			
+			/*
+			 *  Order arcs by the weight's signal. negative first.
+			 *  That is, the arcs that remove markings should fire first.
+			 *   
+			 *  Shuffle every time because sorting is conservative
+			 *  to the position (if two elements are equal).
+			 *  
+			 *  The sorting is done using the compareTo method.
+			 */
+			Collections.shuffle(negativeWeightArcs);
+			Collections.sort(negativeWeightArcs);
+			
+			Collections.shuffle(positiveWeightArcs);
+			Collections.sort(positiveWeightArcs);
+			
+			// go through negative weight arcs first
+			this.disableConflictingTransitions(place, negativeWeightArcs);
+			
+			this.disableConflictingTransitions(place, positiveWeightArcs);
+		}
 	}
 	
 	/**
@@ -156,28 +153,31 @@ public class PetriNet extends AbstractPetriNet{
 	 *  This way there is no risk of an arc enabling a transition that
 	 *  was previously disabled by another arc.
 	 */
-	public void testDisablings(ArrayList <AbstractArc> listedArcs) {
-		for (AbstractArc arcInList : listedArcs) {			
+	public void testDisablings() {
+		
+		this.identifyAndSolveConflicts();
+		
+		for (AbstractArc arcInList : this.arcList) {		
 			arcInList.setTransitionStatus();
 		}			
 	}
 	
 	/**
-	 * Populate the arcsMap with arcs (values) that contains a transition (key).
+	 * Populate the arcsMap with arcs (values) that contains a place (key).
 	 */
 	public void mapArcs() {
 				
 		// a key in the arcsMap
-		AbstractTransition key;
+		AbstractPlace key;
 		
 		/*
-		 *  This loop set the keys (transition) to the map, each with
+		 *  This loop set the keys (place) to the map, each with
 		 *  empty corresponding values (no arcs yet).
 		 */
-		for (AbstractTransition transitionInList : this.transitionList) {			
-			key = transitionInList;
+		for (AbstractPlace placeInList : this.placeList) {			
+			key = placeInList;
 			
-			arcsMap.put(key, new ArrayList <AbstractArc>());
+			arcsMap.put(key, new ArrayList <AbstractArc>());	
 		}
 						
 		/*
@@ -188,10 +188,10 @@ public class PetriNet extends AbstractPetriNet{
 		 */		
 		for (AbstractArc arcInList : this.arcList) {			
 			
-			key = arcInList.getTransition();
+			key = arcInList.getPlace();
 			
 			arcsMap.get(key).add(arcInList);
-		}
+		}		
 	}
 	
 	/**
@@ -201,13 +201,33 @@ public class PetriNet extends AbstractPetriNet{
 	 * Conflicting situations should be solved naturally by doing it that way.
 	 */
 	public void fireNet(){
-		for (AbstractTransition transition : this.transitionList) {
-			
-			testDisablings(arcsMap.get(transition));
-			
+		for (AbstractArc arc : this.arcList){
+									
 			// if enabled, fire
+			if (arc.getTransition().getEnabledStatus()){
+				/*
+				 *  The arcs should be ordered by the weight sign (positive
+				 *  first). This way, the arcs that remove markings will
+				 *  order the firing first.
+				 *  
+				 *  This must be done because otherwise, a transition was not
+				 *  disabled when it should in case of a conflict.
+				 */
+				arc.fireTransition();
+			}
+		}
+	}
+	
+	/**
+	 * Print enabled transitions.
+	 */
+	public void generateLog() {
+		
+		for (AbstractTransition transition : this.transitionList){
 			if (transition.getEnabledStatus()){
-				fireByArcs(arcsMap.get(transition));
+				System.out.println( transition.getName() + " fired at "
+						+ String.valueOf(Evolution.getIteration())
+						+ ", at time " + String.valueOf(Evolution.getTime()) );
 			}
 		}
 	}
@@ -221,6 +241,7 @@ public class PetriNet extends AbstractPetriNet{
 	 * i.e., continuous transitions); also flag a deadlock.
 	 */	
 	public void testDeadlock() {	
+		// TODO verify if correctly functioning
 		boolean deadlock = true;
 		
 		for (AbstractTransition transitionInList : this.transitionList) {			
@@ -253,17 +274,20 @@ public class PetriNet extends AbstractPetriNet{
 	/** 
 	 * The iterate method does one iteration over the net:
 	 *   enable all transitions;
-	 *   order transitions;
 	 *   map arcs;
-	 *   fire net;
+	 *   test all disablings; (by order of weight, negative first; then
+	 *   					 						transition's priority)
+	 *   fire enabled transitions;
 	 */	
 	public void iterateNet() {
 		
 		this.enableAllTransitions();
-		
-		this.orderTransitions();
-		
+				
 		this.mapArcs();
+		
+		this.testDisablings();
+		
+		this.generateLog();
 		
 		this.fireNet();
 	}

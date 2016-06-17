@@ -45,17 +45,37 @@ public class Transition extends AbstractTransition {
     /*
 	 * constructors
 	 */
+	/**
+	 * 
+	 * @param name
+	 * @param priority = 1
+	 * @param firingFunction = 1
+	 */
 	public Transition (String name) {
 		super(name);
+		this.priority = 1;
 		this.firingFunction = 1;
 	}
 	
-	public Transition (String name, double firingFunction) {
+	/**
+	 * 
+	 * @param name
+	 * @param priority
+	 * @param firingFunction = 1
+	 */
+	public Transition (String name, int priority) {
 		super(name);
-		this.firingFunction = firingFunction;
+		this.priority = priority;
+		this.firingFunction = 1;
 	}
 	
-	public Transition (String name, double firingFunction, int priority) {
+	/**
+	 * 
+	 * @param name
+	 * @param priority
+	 * @param firingFunction
+	 */
+	public Transition (String name, int priority, double firingFunction) {
 		super(name);
 		this.firingFunction = firingFunction;
 		this.priority = priority;

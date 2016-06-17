@@ -41,18 +41,36 @@ public class Place extends AbstractPlace {
 	/* 
      * constructors
      */   
+	/**
+	 * 
+	 * @param name
+	 * @param markings = 0
+	 * @param capacity = [0, +inf]
+	 */
     public Place(String name){
 		super(name);
 		this.markings = 0;
 		this.capacity = new double[] {0.0, Double.POSITIVE_INFINITY};
 	}
 	
+    /**
+     * 
+     * @param name
+     * @param markings
+     * @param capacity = [0, +inf]
+     */
 	public Place(String name, int markings){
 		super(name);
 		this.markings = markings;
 		this.capacity = new double[] {0.0, Double.POSITIVE_INFINITY};
 	}
 	
+	/**
+	 * 
+	 * @param name
+	 * @param markings
+	 * @param capacity
+	 */
 	public Place(String name, int markings, double[] capacity){
 		super(name);
 		this.markings = markings;
@@ -63,7 +81,7 @@ public class Place extends AbstractPlace {
 	 * class general methods
 	 */	
 	/**
-	 *  this method checks if the new markings will be in the capacity 
+	 *  This method checks if the new markings will be in the capacity 
 	 *  of the place.
 	 *  
 	 *  As this is a discrete place, the new markings must be an integer.
@@ -79,30 +97,13 @@ public class Place extends AbstractPlace {
 			 *  of the integer division will be zero.
 			 */			
 			valid = true;		
-		}			
+		}
 		return valid;
 	}
 	
 	/*
 	 * mutators
 	 */
-	/** 
-	 * This method changes the markings of a place. It is a mutator.
-	 * 
-	 * It tests if the new value is valid. If not, throws an exception.
-	 */
-	public void changeMarkings(double firingFunction, double weight){		
-				
-		double newValue = this.newMarkingsValue(firingFunction, weight);
-						
-		if (checkValidMarkings(newValue)){
-			this.markings = newValue;
-		}
-		else {
-			throw new UnsupportedOperationException(
-					"Invalid new markings value, did not change.");
-		}
-	}
 	
 	public void changeName(String newName) {this.name = newName;}
 			
@@ -129,4 +130,5 @@ public class Place extends AbstractPlace {
 	 * properties of the elements at each TIME ADVANCEMENT.
 	 */
 	public void update() {}
+	
 }

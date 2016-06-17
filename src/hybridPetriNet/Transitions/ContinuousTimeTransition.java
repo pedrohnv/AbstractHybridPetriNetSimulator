@@ -37,16 +37,34 @@ import hybridPetriNet.Places.Place;
  */
 public class ContinuousTimeTransition extends Transition {
 		
+	/**
+	 * 
+	 * @param name
+	 * @param priority = 1
+	 * @param firingFunction = 1
+	 */
 	public ContinuousTimeTransition(String name) {
 		super(name);
 	}
 
-	public ContinuousTimeTransition(String name, double firingFunction) {
-		super(name, firingFunction);
+	/**
+	 * 
+	 * @param name
+	 * @param priority
+	 * @param firingFunction = 1
+	 */
+	public ContinuousTimeTransition(String name, int priority) {
+		super(name, priority);
 	}
 
-	public ContinuousTimeTransition(String name, double firingFunction, int priority) {
-		super(name, firingFunction, priority);
+	/**
+	 * 
+	 * @param name
+	 * @param priority
+	 * @param firingFunction
+	 */
+	public ContinuousTimeTransition(String name, int priority, double firingFunction) {
+		super(name, priority, firingFunction);
 	}
 		
 	/**
