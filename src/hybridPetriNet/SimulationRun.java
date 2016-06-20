@@ -30,15 +30,16 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
-import hybridPetriNet.Arcs.AbstractArc;
 import hybridPetriNet.PetriNets.PetriNet;
-import hybridPetriNet.Places.AbstractPlace;
-import hybridPetriNet.Transitions.AbstractTransition;
+import hybridPetriNet.Places.Place;
+import hybridPetriNet.Arcs.Arc;
+import hybridPetriNet.Transitions.Transition;
+import userInteraction.LogText;
 
 /**
  * Simulate the Petri nets.
  */
-public abstract class SimulationRun {		
+public  class SimulationRun {		
 	
 	/**
 	 * This attribute stores the simulation result as a string.
@@ -61,7 +62,7 @@ public abstract class SimulationRun {
 	 * single net. This way the firings and priorities are guaranteed
 	 * to synchronize.
 	 * 
-	 * Get the lists of AbstractArcs, AbstractPlaces and AbstractTransitions of each net
+	 * Get the lists of Arcs, Places and Transitions of each net
 	 * and build a unified list of each. To remove duplicates:
 	 * 
 	 * Build a set (this object does not accept duplicates) of each.
@@ -73,9 +74,9 @@ public abstract class SimulationRun {
 	 */
 	protected static PetriNet buildTotalNet(PetriNet ... nets){		
 		
-		ArrayList <AbstractPlace> placeList = new ArrayList <AbstractPlace>();		
-		ArrayList <AbstractTransition> transitionList = new ArrayList <AbstractTransition>();		
-		ArrayList <AbstractArc> arcList = new ArrayList <AbstractArc>();
+		ArrayList <Place> placeList = new ArrayList <Place>();		
+		ArrayList <Transition> transitionList = new ArrayList <Transition>();		
+		ArrayList <Arc> arcList = new ArrayList <Arc>();
 		
 		String names = ""; 
 		
@@ -90,10 +91,10 @@ public abstract class SimulationRun {
 			transitionList.addAll(oneNet.getTransitions());			
 			arcList.addAll(oneNet.getArcs());
 		}
-		
-		Set <AbstractPlace> placeSet = new HashSet<AbstractPlace>();
-		Set <AbstractTransition> transitionSet = new HashSet<AbstractTransition>();
-		Set <AbstractArc> arcSet = new HashSet<AbstractArc>();
+		// sets are used because they do not accept duplicates.
+		Set <Place> placeSet = new HashSet<Place>();
+		Set <Transition> transitionSet = new HashSet<Transition>();
+		Set <Arc> arcSet = new HashSet<Arc>();
 		
 		placeSet.addAll(placeList);
 		transitionSet.addAll(transitionList);
@@ -107,7 +108,7 @@ public abstract class SimulationRun {
 		transitionList.addAll(transitionSet);			
 		arcList.addAll(arcSet);
 		
-		// sort AbstractPlace list by AbstractPlace's index, to organize the results
+		// sort Place list by Place's index, to organize the results
 		Collections.sort(placeList);
 		
 		return (new PetriNet(names , placeList, transitionList, arcList));
@@ -146,16 +147,16 @@ public abstract class SimulationRun {
 	private static void appendResults(PetriNet net){
 		/*  TODO (from Java doc): Instances of StringBuilder are not safe for
 		 *  use by multiple threads. If such synchronization is required then
-		 *  it is recommended that StringBuffer be used.	
+		 *  it is recommended that StringBuffer be used.
 		 */
 		StringBuilder strBuilder = new StringBuilder(stringResults);
 		
-		for (AbstractPlace AbstractPlace : net.getPlaces()) {
+		for (Place Place : net.getPlaces()) {
 			 		 
-			strBuilder.append(AbstractPlace.getName());
+			strBuilder.append(Place.getName());
 			strBuilder.append(','); // separator character
 			 
-			strBuilder.append(AbstractPlace.getIndex());
+			strBuilder.append(Place.getIndex());
 			strBuilder.append(',');
 			 
 			strBuilder.append(Evolution.getTime());
@@ -164,14 +165,14 @@ public abstract class SimulationRun {
 			strBuilder.append(Evolution.getIteration());
 			strBuilder.append(',');
 			 
-			strBuilder.append(AbstractPlace.getMarkings());
+			strBuilder.append(Place.getMarkings());
 			strBuilder.append('\n'); // new line character
 		}		 		 
 		stringResults = strBuilder.toString();
 	}
 	
 	/**
-	 * Creates a table with every marking in every AbstractPlace, at a given
+	 * Creates a table with every marking in every Place, at a given
 	 * time and iteration.
 	 * @param string to save as csv
 	 */
@@ -189,7 +190,7 @@ public abstract class SimulationRun {
 		 printWriter.write(csvString);		 
 		 printWriter.close();
 		 
-		 System.out.println("csv file created: " + ResultsFileName);
+		 LogText.appendMessage("csv file created: " + ResultsFileName);
 	 }
 	 
 	 /**
@@ -201,19 +202,19 @@ public abstract class SimulationRun {
 		    
 		Evolution.setIteration(0);
 			
-		while (Evolution.getIteration() < Evolution.getMaxIterations()){				
-			
-			Evolution.updateIteration();
-						
-			//parentNet.testDeadlock();
+		while (Evolution.getIteration() <= Evolution.getMaxIterations()){				
+					
+			parentNet.testDeadlock();
 						
 			// if deadlocked, break the loop, stop simulation
 			if (parentNet.isDeadlocked()){
-				System.out.println("deadlocked");
+				LogText.appendMessage("deadlocked");
 				break;
 			}	
 			
 			parentNet.iterateNet();		
+			
+			Evolution.updateIteration();
 							
 			/*
 			 *  Append the results from the simulation of the parent net into
@@ -260,15 +261,14 @@ public abstract class SimulationRun {
 	 */
 	public static void RunProgram(PetriNet ... nets) {			
 		
-		System.out.println("simulation starting");
+		LogText.appendMessage("simulation starting");
 		
 		SimulationRun.stringResults = generateHeader();
 		
 		// call program run
 		SimulationRun.simulateNet(nets);
 		
-		System.out.println("simulation ended");
-
+		LogText.appendMessage("simulation ended");
 	}
 	
 }

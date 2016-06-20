@@ -22,8 +22,8 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 package hybridPetriNet.Arcs;
 
-import hybridPetriNet.Places.AbstractPlace;
-import hybridPetriNet.Transitions.AbstractTransition;
+import hybridPetriNet.Places.Place;
+import hybridPetriNet.Transitions.Transition;
 
 /**
  * This is an inhibitor arc.
@@ -41,7 +41,7 @@ public class InhibitorArc extends TestArc {
 	 * @param transition
 	 * @param testThreshold
 	 */
-	public InhibitorArc(AbstractPlace place, AbstractTransition transition,
+	public InhibitorArc(Place place, Transition transition,
 							double testThreshold) {
 		super(place, transition, testThreshold);
 	}
@@ -52,7 +52,7 @@ public class InhibitorArc extends TestArc {
 	 * @param transition
 	 * @param testThresold = 1
 	 */
-	public InhibitorArc(AbstractPlace place, AbstractTransition transition) {
+	public InhibitorArc(Place place, Transition transition) {
 		super(place, transition);
 	}
 
@@ -63,8 +63,8 @@ public class InhibitorArc extends TestArc {
 	 * @param transition
 	 * @param testThresold = 1
 	 */
-	public InhibitorArc(String name, AbstractPlace place,
-			AbstractTransition transition) {
+	public InhibitorArc(String name, Place place,
+			Transition transition) {
 		super(name, place, transition);
 	}
 
@@ -75,8 +75,8 @@ public class InhibitorArc extends TestArc {
 	 * @param transition
 	 * @param testThreshold
 	 */
-	public InhibitorArc(String name, AbstractPlace place,
-			AbstractTransition transition, double testThreshold) {
+	public InhibitorArc(String name, Place place,
+			Transition transition, double testThreshold) {
 		super(name, place, transition, testThreshold);
 	}
 	

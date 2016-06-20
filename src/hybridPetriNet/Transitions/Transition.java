@@ -23,6 +23,8 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 package hybridPetriNet.Transitions;
 
+import java.util.concurrent.atomic.AtomicInteger;
+
 /**
  * The default is a default transition.
  * 
@@ -40,8 +42,21 @@ package hybridPetriNet.Transitions;
  * The enabling check of a transition is done in each arc it has connected
  * to itself.
  */
-public class Transition extends AbstractTransition {
-	    
+public class Transition implements Comparable <Transition> {
+	
+	protected String name;
+	protected double firingFunction = 1;
+	protected int priority = 1;
+	protected boolean enabledStatus = true;
+		
+	// atomic integer because of multithreading
+	private static AtomicInteger counter = new AtomicInteger(0);
+	
+	/*
+	 *  All objects extending the Abstract super class should have a unique
+	 *  index.
+	 */
+	protected final int index;
     /*
 	 * constructors
 	 */
@@ -52,7 +67,8 @@ public class Transition extends AbstractTransition {
 	 * @param firingFunction = 1
 	 */
 	public Transition (String name) {
-		super(name);
+		this.name = name;
+		this.index = counter.incrementAndGet();
 		this.priority = 1;
 		this.firingFunction = 1;
 	}
@@ -64,7 +80,8 @@ public class Transition extends AbstractTransition {
 	 * @param firingFunction = 1
 	 */
 	public Transition (String name, int priority) {
-		super(name);
+		this.name = name;
+		this.index = counter.incrementAndGet();
 		this.priority = priority;
 		this.firingFunction = 1;
 	}
@@ -76,15 +93,31 @@ public class Transition extends AbstractTransition {
 	 * @param firingFunction
 	 */
 	public Transition (String name, int priority, double firingFunction) {
-		super(name);
+		this.name = name;
+		this.index = counter.incrementAndGet();
 		this.firingFunction = firingFunction;
 		this.priority = priority;
 	}
-			
+	
+	/*
+	 * accessors
+	 */
+	public static AtomicInteger getCounter() {return counter;}	
+
+	public String getName() {return this.name;}
+	
+	public double getFiringFunction() {return this.firingFunction;}
+	
+	public int getPriority() {return this.priority;}
+	
+	public int getIndex() {return this.index;}
+	
+	public boolean getEnabledStatus() {return this.enabledStatus;}
+		
+	
 	/*
 	 * mutators
 	 */
-
 	/**
 	 *  This method is used inside an arc method.
 	 */
@@ -110,10 +143,36 @@ public class Transition extends AbstractTransition {
 	 * class general methods
 	 */	
 	/**
+	 *  this method is to override the equals method of an object. It
+	 *  identifies each transition by its index.
+	 */
+	public boolean equals(AbstractTransition other) {
+		boolean equality = false;
+		
+	    if (this.index == other.index) equality = true;
+	    
+	    return equality;
+	}
+	
+	/**
+	 * This method is to compare two transitions based on their priority. 
+	 * It is used to solve conflicts between their firing.
+	 */
+	public int compareTo(Transition other) {
+		
+		if ((other == null) || (this == null)) throw new NullPointerException(
+				"a transition is null");
+		/*
+		 * when sort is called, higher priority will come first;
+		 * as if a transition with higher priority was "lesser".
+		 */
+		return (other.priority - this.priority);
+	}	
+		
+	/**
 	 * the update method is used to create a function that changes the
 	 * properties of the elements at each TIME ADVANCEMENT.
 	 */
 	public void update(){}
-
 		
 }

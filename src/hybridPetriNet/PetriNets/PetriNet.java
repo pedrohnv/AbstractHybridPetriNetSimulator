@@ -25,13 +25,17 @@ package hybridPetriNet.PetriNets;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import hybridPetriNet.Evolution;
-import hybridPetriNet.Arcs.AbstractArc;
-import hybridPetriNet.Places.AbstractPlace;
-import hybridPetriNet.Transitions.AbstractTransition;
+import hybridPetriNet.Arcs.Arc;
+import hybridPetriNet.Places.Place;
+import hybridPetriNet.Transitions.Transition;
 import hybridPetriNet.Transitions.ContinuousTimeTransition;
 import hybridPetriNet.Transitions.TimeDelayedTransition;
+import userInteraction.LogText;
 
 /** 
  * This class implements and defines the behavior of the hybrid Petri net.
@@ -43,7 +47,31 @@ import hybridPetriNet.Transitions.TimeDelayedTransition;
  * by a parent net. The low level net may not be needed to know, only
  * the external places (or maybe transitions, no restrictions to that here).
  */
-public class PetriNet extends AbstractPetriNet{
+public class PetriNet {
+	
+protected String name = "Untitled";
+	
+	// atomic integer because of multithreading
+	private static AtomicInteger counter = new AtomicInteger(0);
+			
+	protected final int index;
+    
+	protected boolean deadlocked = false;
+	
+	/**
+	 * The places are the keys.
+	 * The values are a list of arcs that contains the place
+	 */
+	protected Map <Place, ArrayList<Arc> > arcsMap;
+		
+    /*
+     * Array List because of sorting and shuffling methods
+     */
+	protected ArrayList <Place> placeList = new ArrayList <Place>();
+	
+	protected ArrayList <Transition> transitionList = new ArrayList <Transition>();
+	
+	protected ArrayList <Arc> arcList = new ArrayList <Arc>();
 	
 	/*
 	 * constructors
@@ -53,7 +81,8 @@ public class PetriNet extends AbstractPetriNet{
 	 *  @param name
 	 */
 	public PetriNet(String netName) {
-		super(netName);
+		this.name = netName;
+		this.index = counter.incrementAndGet();
 	}
 	
 	/**
@@ -64,15 +93,81 @@ public class PetriNet extends AbstractPetriNet{
 	 * @param transitionList
 	 * @param arcList
 	 */
-	public PetriNet(String netName, ArrayList<AbstractPlace> placeList, 
-		ArrayList<AbstractTransition> transitionList, 
-		ArrayList<AbstractArc> arcList) {
+	public PetriNet(String netName, ArrayList<Place> placeList, 
+		ArrayList<Transition> transitionList, 
+		ArrayList<Arc> arcList) {
 		
-		super(netName);
+		this.name = netName;
+		this.index = counter.incrementAndGet();
 		this.arcList = arcList;
 		this.transitionList = transitionList;
 		this.placeList = placeList;
 	}
+	
+	
+	/*
+	 * mutators
+	 */
+	 /** 
+	 * Add a single place to created net.
+	 */
+	public void addPlace(Place onePlace) {
+		this.placeList.add(onePlace);
+	}
+	
+	 /** 
+	 * Add a single transition to created net.
+	 */
+	public void addTransition(Transition oneTransition) {
+		this.transitionList.add(oneTransition);
+	}
+	
+	/** 
+	 * Add a single arc to created net.
+	 */
+	public void addArc(Arc oneArc) {
+		this.arcList.add(oneArc);
+	}
+	
+	/**
+	 * Change the name of the net.
+	 * @param name
+	 */
+	public void changeName(String name) {this.name = name;}
+	
+	
+	/*
+	 * accessors
+	 */
+	/** 
+	 * @return net index
+	 */
+	public int getIndex() { return this.index; }
+	
+	/** 
+	 * @return net name
+	 */
+	public String getName() { return this.name; }
+	
+	/** 
+	 * @return array list of net places
+	 */
+	public ArrayList <Place> getPlaces() { return this.placeList; }
+	
+	/** 
+	 * @return array list of net transitions
+	 */
+	public ArrayList <Transition> getTransitions() {
+		return this.transitionList;
+	}
+	
+	/** 
+	 * @return array list of net arcs
+	 */
+	public ArrayList <Arc> getArcs() { return this.arcList; }
+	
+	public boolean isDeadlocked(){return this.deadlocked;}
+	
 	
 	/*
 	 * General and behavior methods
@@ -81,21 +176,31 @@ public class PetriNet extends AbstractPetriNet{
 	 * Disable conflicting transitions.
 	 * @param place
 	 * @param listedArcs
+	 * @return 
 	 */
-	private void disableConflictingTransitions(AbstractPlace place,
-										ArrayList <AbstractArc> listedArcs){
+	private void disableConflictingTransitions(Place place,
+										ArrayList <Arc> listedArcs){
 		
 		double markingsAfterFiring = place.getMarkings();
-				
-		for (AbstractArc arc : listedArcs){
-						
-			AbstractTransition transition = arc.getTransition();
-						
-			markingsAfterFiring += ( transition.getFiringFunction() * arc.getWeight() );
+		
+		for (Arc arc : listedArcs){
+
+			Transition transition = arc.getTransition();
+			
+			// if enabled, verify
+			if (transition.getEnabledStatus()){
+				markingsAfterFiring += 
+						( transition.getFiringFunction() * arc.getWeight() );			
+			}
 					
 			// if not valid, disable
 			if (! place.checkValidMarkings(markingsAfterFiring)){
+				
 				transition.setEnabledStatus(false);
+				
+				// undo the firing
+				markingsAfterFiring -= 
+						( transition.getFiringFunction() * arc.getWeight() );
 			}
 		}
 	}
@@ -106,42 +211,32 @@ public class PetriNet extends AbstractPetriNet{
 	 */
 	private void identifyAndSolveConflicts(){
 		
-		for (AbstractPlace place : this.placeList){
+		for (Place place : this.placeList){
 			
-			ArrayList <AbstractArc> negativeWeightArcs =
-												new ArrayList <AbstractArc>();
+			ArrayList <Arc> negativeWeightArcs =
+												new ArrayList <Arc>();
 			
-			ArrayList <AbstractArc> positiveWeightArcs =
-												new ArrayList <AbstractArc>();
+			ArrayList <Arc> positiveWeightArcs =
+												new ArrayList <Arc>();
 					
 			// make two lists of arcs, ignore zero weight arcs
-			for (AbstractArc arc : arcsMap.get(place)){
+			for (Arc arc : arcsMap.get(place)){
 				if (arc.getWeight() < 0){
 					negativeWeightArcs.add(arc);
 				}
 				else if (arc.getWeight() > 0){
 					positiveWeightArcs.add(arc);
 				}
-			}
-			
-			/*
-			 *  Order arcs by the weight's signal. negative first.
-			 *  That is, the arcs that remove markings should fire first.
-			 *   
-			 *  Shuffle every time because sorting is conservative
-			 *  to the position (if two elements are equal).
-			 *  
-			 *  The sorting is done using the compareTo method.
-			 */
+			}			
 			Collections.shuffle(negativeWeightArcs);
 			Collections.sort(negativeWeightArcs);
 			
-			Collections.shuffle(positiveWeightArcs);
-			Collections.sort(positiveWeightArcs);
-			
-			// go through negative weight arcs first
 			this.disableConflictingTransitions(place, negativeWeightArcs);
 			
+			
+			Collections.shuffle(positiveWeightArcs);
+			Collections.sort(positiveWeightArcs);
+						
 			this.disableConflictingTransitions(place, positiveWeightArcs);
 		}
 	}
@@ -153,31 +248,32 @@ public class PetriNet extends AbstractPetriNet{
 	 *  This way there is no risk of an arc enabling a transition that
 	 *  was previously disabled by another arc.
 	 */
-	public void testDisablings() {
-		
-		this.identifyAndSolveConflicts();
-		
-		for (AbstractArc arcInList : this.arcList) {		
+	private void testDisablings() {
+			
+		for (Arc arcInList : this.arcList) {		
 			arcInList.setTransitionStatus();
 		}			
+		this.identifyAndSolveConflicts();
 	}
 	
 	/**
 	 * Populate the arcsMap with arcs (values) that contains a place (key).
 	 */
-	public void mapArcs() {
+	private void mapArcs() {
+		
+		arcsMap = new HashMap < Place, ArrayList<Arc> >();
 				
 		// a key in the arcsMap
-		AbstractPlace key;
+		Place key;
 		
 		/*
 		 *  This loop set the keys (place) to the map, each with
 		 *  empty corresponding values (no arcs yet).
 		 */
-		for (AbstractPlace placeInList : this.placeList) {			
+		for (Place placeInList : this.placeList) {			
 			key = placeInList;
 			
-			arcsMap.put(key, new ArrayList <AbstractArc>());	
+			arcsMap.put(key, new ArrayList <Arc>());	
 		}
 						
 		/*
@@ -186,7 +282,7 @@ public class PetriNet extends AbstractPetriNet{
 		 *  Loop through all arcs, get its transition (key) and add the arc to
 		 *  the map.
 		 */		
-		for (AbstractArc arcInList : this.arcList) {			
+		for (Arc arcInList : this.arcList) {			
 			
 			key = arcInList.getPlace();
 			
@@ -200,8 +296,8 @@ public class PetriNet extends AbstractPetriNet{
 	 * 
 	 * Conflicting situations should be solved naturally by doing it that way.
 	 */
-	public void fireNet(){
-		for (AbstractArc arc : this.arcList){
+	private void fireNet(){
+		for (Arc arc : this.arcList){
 									
 			// if enabled, fire
 			if (arc.getTransition().getEnabledStatus()){
@@ -219,13 +315,13 @@ public class PetriNet extends AbstractPetriNet{
 	}
 	
 	/**
-	 * Print enabled transitions.
+	 * Print transitions that are firing.
 	 */
-	public void generateLog() {
+	private void generateLog() {
 		
-		for (AbstractTransition transition : this.transitionList){
+		for (Transition transition : this.transitionList){
 			if (transition.getEnabledStatus()){
-				System.out.println( transition.getName() + " fired at "
+				LogText.appendMessage( transition.getName() + " fired at iteration "
 						+ String.valueOf(Evolution.getIteration())
 						+ ", at time " + String.valueOf(Evolution.getTime()) );
 			}
@@ -240,11 +336,12 @@ public class PetriNet extends AbstractPetriNet{
 	 * because of a delay (or the firing function is a function of time,
 	 * i.e., continuous transitions); also flag a deadlock.
 	 */	
+	@SuppressWarnings("unused")
 	public void testDeadlock() {	
 		// TODO verify if correctly functioning
 		boolean deadlock = true;
 		
-		for (AbstractTransition transitionInList : this.transitionList) {			
+		for (Transition transitionInList : this.transitionList) {			
 			
 			if ( transitionInList.getEnabledStatus() || (
 					
@@ -257,7 +354,8 @@ public class PetriNet extends AbstractPetriNet{
 				deadlock = false;				
 			}			
 		}
-		this.deadlocked = deadlock;
+		// TODO for now, always return false; until verification
+		this.deadlocked = false;
 	}
 
 	/**
@@ -265,8 +363,8 @@ public class PetriNet extends AbstractPetriNet{
 	 *  
 	 *  This is done at the beginning of each new iteration.
 	 */
-	public void enableAllTransitions() {
-		for (AbstractTransition transition : this.transitionList) {
+	private void enableAllTransitions() {
+		for (Transition transition : this.transitionList) {
 			transition.setEnabledStatus(true);
 		}
 	}
@@ -275,16 +373,18 @@ public class PetriNet extends AbstractPetriNet{
 	 * The iterate method does one iteration over the net:
 	 *   enable all transitions;
 	 *   map arcs;
-	 *   test all disablings; (by order of weight, negative first; then
-	 *   					 						transition's priority)
+	 *   test all disabling while solving conflicts;
 	 *   fire enabled transitions;
 	 */	
 	public void iterateNet() {
 		
 		this.enableAllTransitions();
 				
-		this.mapArcs();
+		if (this.arcsMap == null){
+			this.mapArcs();
+		}		
 		
+		// also tests for conflicts
 		this.testDisablings();
 		
 		this.generateLog();
@@ -294,13 +394,13 @@ public class PetriNet extends AbstractPetriNet{
 	
 	public void updateElements() {
 		// update all elements in the net
-		for (AbstractPlace place : this.placeList){
+		for (Place place : this.placeList){
 			place.update();
 		}
-		for (AbstractTransition transition : this.transitionList){
+		for (Transition transition : this.transitionList){
 			transition.update();
 		}
-		for (AbstractArc arc : this.arcList){
+		for (Arc arc : this.arcList){
 			arc.update();
 		}
 	}
