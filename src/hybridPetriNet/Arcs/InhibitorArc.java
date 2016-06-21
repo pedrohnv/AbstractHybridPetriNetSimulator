@@ -27,16 +27,15 @@ import hybridPetriNet.Transitions.Transition;
 
 /**
  * This is an inhibitor arc.
- * 
+ * <p>
  * It is very similar to a test arc, except that the testing is done if the
  * markings are greater than a threshold.
- * 
+ * <p>
  * If markings > threshold, the transition is disabled.
  */
 public class InhibitorArc extends TestArc {
 
 	/**
-	 * 
 	 * @param place
 	 * @param transition
 	 * @param testThreshold
@@ -47,7 +46,6 @@ public class InhibitorArc extends TestArc {
 	}
 
 	/**
-	 * 
 	 * @param place
 	 * @param transition
 	 * @param testThresold = 1
@@ -57,7 +55,6 @@ public class InhibitorArc extends TestArc {
 	}
 
 	/**
-	 * 
 	 * @param name
 	 * @param place
 	 * @param transition
@@ -69,7 +66,6 @@ public class InhibitorArc extends TestArc {
 	}
 
 	/**
-	 * 
 	 * @param name
 	 * @param place
 	 * @param transition
@@ -82,7 +78,7 @@ public class InhibitorArc extends TestArc {
 	
 	/** 
 	 * The inhibitor arc disabling function: tests if the markings in the
-	 *  place are GREATER than a threshold.
+	 * place are GREATER than a threshold.
 	 */
 	public boolean thresholdDisablingFunction() {
 

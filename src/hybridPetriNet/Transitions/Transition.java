@@ -27,18 +27,18 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * The default is a default transition.
- * 
+ * <p>
  * A transition is disabled if any disabling function of an arc returns
  * true.
- * 
+ * <p>
  * The attributes are: name, firing function, priority, enabled status.
- *  
+ *  <p>
  * A situation of conflict arises when the simultaneous firing of two or
  * more transitions would cause the markings of a place to go out of its
  * capacity. In that case the transitions will fire one by one, in order,
  * from the highest priority to the lowest. If multiple transitions have
  * the same priority, the one that fires is selected randomly.
- * 
+ * <p>
  * The enabling check of a transition is done in each arc it has connected
  * to itself.
  */
@@ -61,7 +61,6 @@ public class Transition implements Comparable <Transition> {
 	 * constructors
 	 */
 	/**
-	 * 
 	 * @param name
 	 * @param priority = 1
 	 * @param firingFunction = 1
@@ -74,7 +73,6 @@ public class Transition implements Comparable <Transition> {
 	}
 	
 	/**
-	 * 
 	 * @param name
 	 * @param priority
 	 * @param firingFunction = 1
@@ -87,7 +85,6 @@ public class Transition implements Comparable <Transition> {
 	}
 	
 	/**
-	 * 
 	 * @param name
 	 * @param priority
 	 * @param firingFunction
@@ -130,7 +127,7 @@ public class Transition implements Comparable <Transition> {
 	/**
 	 * If priority is a function, it is recommended to implement the logic in
 	 * the main program run.
-	 * 
+	 * <p>
 	 * The same for the firing Function...
 	 */
 	public void changePriority(int newPriority) {this.priority = newPriority;}
@@ -143,10 +140,10 @@ public class Transition implements Comparable <Transition> {
 	 * class general methods
 	 */	
 	/**
-	 *  this method is to override the equals method of an object. It
+	 *  This method is to override the equals method of an object. It
 	 *  identifies each transition by its index.
 	 */
-	public boolean equals(AbstractTransition other) {
+	public boolean equals(Transition other) {
 		boolean equality = false;
 		
 	    if (this.index == other.index) equality = true;
@@ -155,7 +152,8 @@ public class Transition implements Comparable <Transition> {
 	}
 	
 	/**
-	 * This method is to compare two transitions based on their priority. 
+	 * This method is to compare two transitions based on their priority.
+	 * <p>
 	 * It is used to solve conflicts between their firing.
 	 */
 	public int compareTo(Transition other) {
@@ -170,7 +168,7 @@ public class Transition implements Comparable <Transition> {
 	}	
 		
 	/**
-	 * the update method is used to create a function that changes the
+	 * The update method is used to create a function that changes the
 	 * properties of the elements at each TIME ADVANCEMENT.
 	 */
 	public void update(){}

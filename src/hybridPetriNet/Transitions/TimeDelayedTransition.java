@@ -29,12 +29,12 @@ import hybridPetriNet.Evolution;
  * This transition is one that fires after a time delay.
  * The enabled time is updated in the update method, which
  * should be called at every new time advancement.
- * 
+ * <p>
  * After enabled for the delay time, it can fire at every ITERATION.
- * 
+ * <p>
  * new attributes: delayed firing function (the value of the firing function
  * after the delay has passed), enabled time, delay.
- * 
+ * <p>
  * Though this transition can function as a normal one (setting the delay
  * to zero), it is highly discouraged because of the extra code that is
  * run in the setEnabledStatus and update methods, i.e., greater processing
@@ -58,7 +58,6 @@ public class TimeDelayedTransition extends Transition {
 	protected double delay = 1;
 	
 	/**
-	 * 
 	 * @param name
 	 * @param priority = 1
 	 * @param firingFunction = 0
@@ -71,7 +70,6 @@ public class TimeDelayedTransition extends Transition {
 	}
 
 	/**
-	 * 
 	 * @param name
 	 * @param delay
 	 * @param priority = 1
@@ -86,7 +84,6 @@ public class TimeDelayedTransition extends Transition {
 	}	
 	
 	/**
-	 * 
 	 * @param name
 	 * @param delay
 	 * @param delayedFiringFunction
@@ -102,7 +99,6 @@ public class TimeDelayedTransition extends Transition {
 	}
 	
 	/**
-	 * 
 	 * @param name
 	 * @param delay
 	 * @param delayedFiringFunction
@@ -173,7 +169,7 @@ public class TimeDelayedTransition extends Transition {
 	}
 
 	/**
-	 * the update method is used to create a function that changes the
+	 * The update method is used to create a function that changes the
 	 * properties of the elements at each TIME ADVANCEMENT.
 	 */
 	public void update(){

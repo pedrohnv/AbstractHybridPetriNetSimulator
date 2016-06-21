@@ -43,6 +43,7 @@ public  class SimulationRun {
 	
 	/**
 	 * This attribute stores the simulation result as a string.
+	 * <p>
 	 * It is saved in a CSV file when the simulation ends.
 	 */
 	private static String stringResults;
@@ -61,10 +62,10 @@ public  class SimulationRun {
 	 * This method takes any number of input nets and makes one
 	 * single net. This way the firings and priorities are guaranteed
 	 * to synchronize.
-	 * 
+	 * <p>
 	 * Get the lists of Arcs, Places and Transitions of each net
 	 * and build a unified list of each. To remove duplicates:
-	 * 
+	 * <p>
 	 * Build a set (this object does not accept duplicates) of each.
 	 * 
 	 * Clear lists, rebuild from the set with unique elements.
@@ -141,7 +142,6 @@ public  class SimulationRun {
 		
 	/**
 	 * Append new results to stringResults of Program Run.
-	 * 
 	 * @param Petri net being simulated
 	 */
 	private static void appendResults(PetriNet net){
@@ -195,10 +195,10 @@ public  class SimulationRun {
 	 
 	 /**
 	 * Iterate net until max iteration is reached.
-	 * 
+	 * <p>
 	 * set the iteration to zero and loop.
 	 */
-	 public static void loopIterate(PetriNet parentNet){
+	 private static void loopIterate(PetriNet parentNet){
 		    
 		Evolution.setIteration(0);
 			
@@ -231,7 +231,7 @@ public  class SimulationRun {
 	 * @param nets
 	 * @throws FileNotFoundException 
 	 */
-	public static void simulateNet(PetriNet ... nets) {
+	private static void simulateNet(PetriNet ... nets) {
 		
 		PetriNet parentNet = buildTotalNet(nets);
 
@@ -257,7 +257,7 @@ public  class SimulationRun {
 	}
 	
 	/**
-	 * Run the program
+	 * Run the program.
 	 */
 	public static void RunProgram(PetriNet ... nets) {			
 		

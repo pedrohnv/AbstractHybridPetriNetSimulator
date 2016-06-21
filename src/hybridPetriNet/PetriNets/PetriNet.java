@@ -39,10 +39,10 @@ import userInteraction.LogText;
 
 /** 
  * This class implements and defines the behavior of the hybrid Petri net.
- * 
+ * <p>
  * Multiple Petri nets can be created. This way, it is possible to make
  * object oriented net (see the works of Rainer Drath).
- * 
+ * <p>
  * The advantage of this is that one net can be connected to a second one
  * by a parent net. The low level net may not be needed to know, only
  * the external places (or maybe transitions, no restrictions to that here).
@@ -60,6 +60,7 @@ protected String name = "Untitled";
 	
 	/**
 	 * The places are the keys.
+	 * <p>
 	 * The values are a list of arcs that contains the place
 	 */
 	protected Map <Place, ArrayList<Arc> > arcsMap;
@@ -242,9 +243,9 @@ protected String name = "Untitled";
 	}
 	
 	/**
-	 *  set enabling of every transition in list. Will set to false if disabling
+	 *  Set enabling of every transition in list. Will set to false if disabling
 	 *  condition is met; no change otherwise.
-	 *  
+	 *  <p>
 	 *  This way there is no risk of an arc enabling a transition that
 	 *  was previously disabled by another arc.
 	 */
@@ -293,7 +294,7 @@ protected String name = "Untitled";
 	/**
 	 * Fire transitions (by priority), testing for disabling in each new
 	 * transition.
-	 * 
+	 * <p>
 	 * Conflicting situations should be solved naturally by doing it that way.
 	 */
 	private void fireNet(){
@@ -331,7 +332,7 @@ protected String name = "Untitled";
 	/**
 	 * Tests for a deadlock. If all transitions are disabled
 	 * (enabledStatus = false), then flag a deadlock.
-	 * 
+	 * <p>
 	 * OR if the only enabled transitions are waiting for time to pass
 	 * because of a delay (or the firing function is a function of time,
 	 * i.e., continuous transitions); also flag a deadlock.
@@ -359,8 +360,8 @@ protected String name = "Untitled";
 	}
 
 	/**
-	 *  set all transitions to enabled(true)
-	 *  
+	 *  Set all transitions to enabled(true).
+	 *  <p>
 	 *  This is done at the beginning of each new iteration.
 	 */
 	private void enableAllTransitions() {
@@ -371,10 +372,10 @@ protected String name = "Untitled";
 	
 	/** 
 	 * The iterate method does one iteration over the net:
-	 *   enable all transitions;
-	 *   map arcs;
-	 *   test all disabling while solving conflicts;
-	 *   fire enabled transitions;
+	 *   <p>- enable all transitions;
+	 *   <p>- map arcs;
+	 *   <p>- test all disabling while solving conflicts;
+	 *   <p>- fire enabled transitions;
 	 */	
 	public void iterateNet() {
 		

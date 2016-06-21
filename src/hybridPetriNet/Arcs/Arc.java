@@ -30,22 +30,24 @@ import hybridPetriNet.Transitions.Transition;
 
 /** 
  * The default arc is a normal one.
- * 
+ * <p>
  * Attributes: name, a place, a transition, weight.
- * 
+ * <p>
  * It also has a default Disabling Function method. To customize this
  * function, it is necessary to create a custom method, without overwriting the
  * default. The final disabling function will be a boolean OR function of every
  * disabling function an arc has. Override FinalDisablingFunction().
- * 
+ * <p>
  * A transition is disabled if any disabling function returns true. 
- *  
+ * <p>
  * If the weight is a function, that function must be external and call
  * the changeWeight method iteratively.
- *  
+ * <p> 
  * For normal arcs, the weight determines the direction (tough the transition's
  * firing speed must be positive in this interpretation).
+ * <p>
  * Place -> transition, weight < 0;
+ * <p>
  * Transition -> place, weight > 0.
  */
 public class Arc implements Comparable<Arc> {
@@ -183,7 +185,7 @@ public class Arc implements Comparable<Arc> {
 	 * iterate over them checking if any returns true. If so, the
 	 * transition will be considered disabled (its enabled status will
 	 * be false).
-	 * 
+	 * <p>
 	 * The final value will be achieved using a boolean OR function.
 	 */
 	private boolean finalDisablingFunction() {		
@@ -201,7 +203,7 @@ public class Arc implements Comparable<Arc> {
 	/**
 	 *  If there is command to disable, enabled status of transition is
 	 *  set to false.
-	 *  
+	 *  <p>
 	 *  In the behavior of the net, all transitions will have their enabled
 	 *  status set to TRUE at the beginning of each iteration.
 	 */
@@ -226,7 +228,7 @@ public class Arc implements Comparable<Arc> {
 	}
 	
 	/**
-	 *  this method is to override the equals method of an object. It 
+	 *  This method is to override the equals method of an object. It 
 	 *  identifies each arc by its index.
 	 */
 	public boolean equals(Arc other) {
@@ -242,10 +244,10 @@ public class Arc implements Comparable<Arc> {
 	 *  This method fires the transition. That is, changes the markings in
 	 *  the place in this arc, according to its weight and transition's
 	 *  firing function.
-	 *  
+	 *  <p>
 	 *  if is a timed transition and is not the first iteration, stop
 	 *  execution.
-	 *  
+	 *  <p>
 	 *  if the transition is enabled, fire; else, throw exception.
 	 */	
 	public void fireTransition() {
@@ -259,7 +261,7 @@ public class Arc implements Comparable<Arc> {
 		
 	
 	/**
-	 * the update method is used to create a function that changes the
+	 * The update method is used to create a function that changes the
 	 * properties of the elements at each TIME ADVANCEMENT.
 	 */
 	public void update(){}

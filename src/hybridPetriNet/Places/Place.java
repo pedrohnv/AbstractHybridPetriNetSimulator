@@ -27,11 +27,11 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * The default place is a discrete place.
- * 
+ * <p>
  * Attributes: name, markings, capacity.
- * 
+ * <p>
  * The markings are doubles.
- * 
+ * <p>
  * The capacity attribute sets both the lower and upper bound
  * to the capacity, i.e., the minimum and maximum values the
  * markings may have (included).
@@ -111,8 +111,8 @@ public class Place implements Comparable<Place> {
 	 * class general methods
 	 */	
 	/**
-	 *  this method is to override the equals method of an object.
-	 *   It identifies each place by its index.
+	 *  This method is to override the equals method of an object.
+	 *  It identifies each place by its index.
 	 */
 	public boolean equals(Place other) {		
 		
@@ -126,10 +126,9 @@ public class Place implements Comparable<Place> {
     /**
 	 *  This method returns the new values the markings of a place will
 	 *  have after the firing of a transition.
-	 *  
+	 *  <p>
 	 *  This method does not change the markings of a place. It is 
 	 *  used for testing.
-	 *  
 	 *  @return double
 	 */
 	public double newMarkingsValue(double firingFunction, double weight){		
@@ -140,7 +139,7 @@ public class Place implements Comparable<Place> {
 	/**
 	 *  This method checks if the new markings will be in the capacity 
 	 *  of the place.
-	 *  
+	 *  <p>
 	 *  As this is a discrete place, the new markings must be an integer.
 	 */	
 	public boolean checkValidMarkings(double newValue){
@@ -165,7 +164,7 @@ public class Place implements Comparable<Place> {
 	 * This method changes the new markings of a place; i.e., the values
 	 * it will have by the end of the simulation. This signature is based
 	 * on the firing of a transition.
-	 * 
+	 * <p>
 	 * It tests if the new value is valid. If not, throws an exception.
 	 */
 	public void changeMarkings(double firingFunction, double weight){		
@@ -184,7 +183,7 @@ public class Place implements Comparable<Place> {
 	/** 
 	 * This method changes the new markings of a place; i.e., the values
 	 * it will have by the end of the simulation.
-	 * 
+	 * <p>
 	 * It tests if the new value is valid. If not, throws an exception.
 	 */
 	public void changeMarkings(double newValue){		
@@ -201,9 +200,9 @@ public class Place implements Comparable<Place> {
 	public void changeName(String newName) {this.name = newName;}
 			
 	/**
-	 * capacity must be an array of doubles with two elements.
+	 * Capacity must be an array of doubles with two elements.
 	 * @param newCapacity = [min, max]
-	 * 
+	 * <p>
 	 * If capacity is a function, it is recommended to implement the logic in
 	 * the update method.
 	 */
@@ -219,7 +218,7 @@ public class Place implements Comparable<Place> {
 	}
 	
 	/**
-	 * the update method is used to create a function that changes the
+	 * The update method is used to create a function that changes the
 	 * properties of the elements at each TIME ADVANCEMENT.
 	 */
 	public void update() {}

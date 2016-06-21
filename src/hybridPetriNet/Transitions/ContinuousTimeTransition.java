@@ -30,7 +30,7 @@ import hybridPetriNet.Places.Place;
  * The continuous time transition fires only in the FIRST ITERATION (when
  * times advances), i.e., the firing function is exclusively a function of
  * time (and not iteration).
- * 
+ * <p>
  * Set the firing function of this transition as the desired output TIMES
  * the Step time. In other words, this transition will change markings
  * corresponding to its firing function in ONE time step.
@@ -38,7 +38,6 @@ import hybridPetriNet.Places.Place;
 public class ContinuousTimeTransition extends Transition {
 		
 	/**
-	 * 
 	 * @param name
 	 * @param priority = 1
 	 * @param firingFunction = 1
@@ -48,7 +47,6 @@ public class ContinuousTimeTransition extends Transition {
 	}
 
 	/**
-	 * 
 	 * @param name
 	 * @param priority
 	 * @param firingFunction = 1
@@ -58,7 +56,6 @@ public class ContinuousTimeTransition extends Transition {
 	}
 
 	/**
-	 * 
 	 * @param name
 	 * @param priority
 	 * @param firingFunction
@@ -70,7 +67,7 @@ public class ContinuousTimeTransition extends Transition {
 	/**
 	 *  This method fires the transition. That is, changes the markings in
 	 *  a place according to the arc weight and transition's firing.
-	 *  
+	 *  <p>
 	 *  The transition will fire only in the first iteration.
 	 */	
 	public void fire(Place place, double weight){

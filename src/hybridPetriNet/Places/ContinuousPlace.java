@@ -31,7 +31,6 @@ public class ContinuousPlace extends Place {
 	 * Constructors
 	 */
 	/**
-	 * 
 	 * @param name
 	 * @param markings = 0
 	 * @param capacity = [0, +inf]
@@ -41,7 +40,6 @@ public class ContinuousPlace extends Place {
 	}
 
 	/**
-	 * 
 	 * @param name
 	 * @param markings
 	 * @param capacity = [0, +inf]
@@ -52,7 +50,6 @@ public class ContinuousPlace extends Place {
 	}
 
 	/**
-	 * 
 	 * @param name
 	 * @param markings
 	 * @param capacity
@@ -67,7 +64,7 @@ public class ContinuousPlace extends Place {
 	 * Object methods
 	 */
 	/**
-	 *  this method checks if the new markings will be in the 
+	 *  This method checks if the new markings will be in the 
 	 *  capacity of the place.
 	 */
 	public boolean checkValidMarkings(double newValue){

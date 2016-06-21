@@ -27,14 +27,14 @@ import hybridPetriNet.Transitions.Transition;
 
 /**
  * This is a test arc.
- * 
+ * <p>
  * It has the attribute threshold, which is used in the threshold 
  * disabling function.
- * 
+ * <p>
  * The weight must be zero.
- * 
+ * <p>
  * If markings < threshold, the transition is disabled.
- * 
+ * <p>
  * An inhibitor arc's logic can be made by setting the threshold lower than
  * zero; unless it is wanted that the threshold be exactly zero. Then
  * explicitly use an inhibitor arc.
@@ -63,7 +63,6 @@ public class TestArc extends Arc {
 	}
 	
 	/**
-	 * 
 	 * @param name
 	 * @param place
 	 * @param transition
@@ -75,7 +74,6 @@ public class TestArc extends Arc {
 	}
 
 	/**
-	 * 
 	 * @param name
 	 * @param place
 	 * @param transition
@@ -89,7 +87,7 @@ public class TestArc extends Arc {
 	
 	/** 
 	 * The test arc disabling function: tests if the markings in the
-	 *  place are SMALLER than a threshold.
+	 * place are SMALLER than a threshold.
 	 */
 	public boolean thresholdDisablingFunction() {
 
@@ -103,11 +101,11 @@ public class TestArc extends Arc {
 	}
 	
 	/**
-	 * this function should take all disabling functions of the arc,
+	 * This function should take all disabling functions of the arc,
 	 * iterate over them checking if any returns true. If so, the
 	 * transition will be considered disabled (its enabled status will
 	 * be false).
-	 * 
+	 * <p>
 	 * The final value will be achieved using a boolean OR function.
 	 */
 	public boolean finalDisablingFunction() {		

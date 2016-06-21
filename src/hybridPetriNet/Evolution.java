@@ -31,16 +31,16 @@ public abstract class Evolution {
 	
 	private static double time = 0;
 	
-	/** up to what time should the program run?*/
+	/** Up to what time should the program run?*/
 	private static double finalTime = 1;
 	
-	/** make the timeStep a common divisor of all time constants in the net.*/
+	/** Make the timeStep a common divisor of all time constants in the net.*/
 	private static double timeStep = 1;
 	/* TODO add dynamic time step. Make it be the smallest value to which a
  	 * change in the net occurs (a transition is enabled or disabled).
  	 */
 		
-	/** the integration step, should integration be needed.*/
+	/** The integration step, should integration be needed.*/
 	private static double integrationStep = 1e-6;
 	
 	private static int iteration = 0;
@@ -79,11 +79,11 @@ public abstract class Evolution {
 	/*
 	 * mutators 
 	 */	
-	/** change the current iteration*/
+	/** Change the current iteration*/
 	public static void setIteration(int newIteration){
 		Evolution.iteration = newIteration;}
 	
-	/** change the time step*/
+	/** Change the time step*/
 	public static void setTimeStep(double newTimeStep){
 		if (integrationStep == 0) {
 			throw new UnsupportedOperationException(
@@ -91,11 +91,11 @@ public abstract class Evolution {
 		} else {Evolution.timeStep = newTimeStep;}
 	}
 	
-	/** change the ending time*/
+	/** Change the ending time*/
 	public static void setFinalTime(double newFinalTime){
 		Evolution.finalTime = newFinalTime;}
 		
-	/** change the maximum number of iterations to consider livelock*/
+	/** Change the maximum number of iterations to consider livelock*/
 	public static void setMaxIterations(int newMaxIterations){
 		Evolution.maxIterations = newMaxIterations;}
 
@@ -109,11 +109,11 @@ public abstract class Evolution {
 	/*
 	 * Updaters
 	 */
-	/** advance one time step*/
+	/** Advance one time step.*/
 	public static void updateTime(){
 		Evolution.time += Evolution.timeStep;}
 		
-	/** advance one iteration*/
+	/** Advance one iteration.*/
 	public static void updateIteration(){
 		Evolution.iteration += 1;}
 
