@@ -34,15 +34,15 @@ public abstract class Evolution {
 	/** Up to what time should the program run?*/
 	private static double finalTime = 1;
 	
-	/** Make the timeStep a common divisor of all time constants in the net.*/
+	/** Make the timeStep a common divisor of all time constants in the net.
+	 * <p>
+	 * It is alsu used as the integration step.
+	 */
 	private static double timeStep = 1;
 	/* TODO add dynamic time step. Make it be the smallest value to which a
  	 * change in the net occurs (a transition is enabled or disabled).
  	 */
-		
-	/** The integration step, should integration be needed.*/
-	private static double integrationStep = 1e-6;
-	
+			
 	private static int iteration = 0;
 	
 	/** This is used to end the program, considering a net livelocked.*/
@@ -79,13 +79,21 @@ public abstract class Evolution {
 	/*
 	 * mutators 
 	 */	
+	/**
+	 * change current time
+	 */
+	public static void reset() {
+		Evolution.iteration = 0;
+		Evolution.time = 0;
+	}
+	
 	/** Change the current iteration*/
 	public static void setIteration(int newIteration){
 		Evolution.iteration = newIteration;}
 	
 	/** Change the time step*/
 	public static void setTimeStep(double newTimeStep){
-		if (integrationStep == 0) {
+		if (timeStep == 0) {
 			throw new UnsupportedOperationException(
 					"Invalid value, did not change."); 
 		} else {Evolution.timeStep = newTimeStep;}
@@ -98,14 +106,7 @@ public abstract class Evolution {
 	/** Change the maximum number of iterations to consider livelock*/
 	public static void setMaxIterations(int newMaxIterations){
 		Evolution.maxIterations = newMaxIterations;}
-
-	public static void setIntegrationStep(double integrationStep) {
-		if (integrationStep == 0) {
-			throw new UnsupportedOperationException(
-					"Invalid value, did not change."); 
-		} else {Evolution.integrationStep = integrationStep;}
-	}
-	
+		
 	/*
 	 * Updaters
 	 */
@@ -116,10 +117,5 @@ public abstract class Evolution {
 	/** Advance one iteration.*/
 	public static void updateIteration(){
 		Evolution.iteration += 1;}
-
-	public static double getIntegrationStep() {
-		return integrationStep;
-	}
-	
 		
 }

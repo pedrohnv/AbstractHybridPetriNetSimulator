@@ -49,30 +49,32 @@ import userInteraction.LogText;
  */
 public class PetriNet {
 	
-protected String name = "Untitled";
+	private String name = "Untitled";
 	
 	// atomic integer because of multithreading
 	private static AtomicInteger counter = new AtomicInteger(0);
 			
-	protected final int index;
+	private final int index;
     
-	protected boolean deadlocked = false;
+	private boolean deadlocked = false;
+	
+	private boolean livelocked = false;
 	
 	/**
 	 * The places are the keys.
 	 * <p>
 	 * The values are a list of arcs that contains the place
 	 */
-	protected Map <Place, ArrayList<Arc> > arcsMap;
+	private Map <Place, ArrayList<Arc> > arcsMap;
 		
     /*
      * Array List because of sorting and shuffling methods
      */
-	protected ArrayList <Place> placeList = new ArrayList <Place>();
+	private ArrayList <Place> placeList = new ArrayList <Place>();
 	
-	protected ArrayList <Transition> transitionList = new ArrayList <Transition>();
+	private ArrayList <Transition> transitionList = new ArrayList <Transition>();
 	
-	protected ArrayList <Arc> arcList = new ArrayList <Arc>();
+	private ArrayList <Arc> arcList = new ArrayList <Arc>();
 	
 	/*
 	 * constructors
@@ -100,9 +102,26 @@ protected String name = "Untitled";
 		
 		this.name = netName;
 		this.index = counter.incrementAndGet();
-		this.arcList = arcList;
-		this.transitionList = transitionList;
 		this.placeList = placeList;
+		this.transitionList = transitionList;
+		this.arcList = arcList;
+	}
+	
+	/**
+	 * Create a new Petri net from list of places, transitions and arcs.
+	 * Without name.
+	 * @param placeList
+	 * @param transitionList
+	 * @param arcList
+	 */
+	public PetriNet(ArrayList<Place> placeList, 
+		ArrayList<Transition> transitionList, 
+		ArrayList<Arc> arcList) {
+		
+		this.index = counter.incrementAndGet();
+		this.placeList = placeList;
+		this.transitionList = transitionList;
+		this.arcList = arcList;
 	}
 	
 	
@@ -169,6 +188,7 @@ protected String name = "Untitled";
 	
 	public boolean isDeadlocked(){return this.deadlocked;}
 	
+	public boolean isLivelocked(){return this.livelocked;}
 	
 	/*
 	 * General and behavior methods
@@ -286,7 +306,7 @@ protected String name = "Untitled";
 		for (Arc arcInList : this.arcList) {			
 			
 			key = arcInList.getPlace();
-			
+
 			arcsMap.get(key).add(arcInList);
 		}		
 	}
@@ -322,6 +342,7 @@ protected String name = "Untitled";
 		
 		for (Transition transition : this.transitionList){
 			if (transition.getEnabledStatus()){
+				
 				LogText.appendMessage( transition.getName() + " fired at iteration "
 						+ String.valueOf(Evolution.getIteration())
 						+ ", at time " + String.valueOf(Evolution.getTime()) );
@@ -337,35 +358,47 @@ protected String name = "Untitled";
 	 * because of a delay (or the firing function is a function of time,
 	 * i.e., continuous transitions); also flag a deadlock.
 	 */	
-	@SuppressWarnings("unused")
 	public void testDeadlock() {	
-		// TODO verify if correctly functioning
-		boolean deadlock = true;
 		
+		boolean deadlock = true;
+				
 		for (Transition transitionInList : this.transitionList) {			
+						
+			boolean enabled = transitionInList.getEnabledStatus();
 			
-			if ( transitionInList.getEnabledStatus() || (
-					
-					(transitionInList instanceof ContinuousTimeTransition) ||
-					
-					((transitionInList instanceof TimeDelayedTransition) &&
-							(transitionInList.getFiringFunction() != 0.0)) ) ){
-
-				// a transition is enabled
-				deadlock = false;				
+			boolean continuous = transitionInList instanceof ContinuousTimeTransition;
+			
+			boolean timeDelayed = transitionInList instanceof TimeDelayedTransition;
+			
+			boolean notNullFiring = (transitionInList.getFiringFunction() != 0.0);
+			
+			boolean notNullDelayed = (timeDelayed && notNullFiring);
+			
+			if ( enabled || continuous || notNullDelayed ){
+				// a transition is enabled or waiting time to pass
+				deadlock = false;
+				break;
 			}			
-		}
-		// TODO for now, always return false; until verification
-		this.deadlocked = false;
+		}		
+		this.deadlocked = deadlock;
 	}
-
+	
+	public void testLivelock(){
+		if (Evolution.getIteration() == Evolution.getMaxIterations()) {
+						
+			this.livelocked = true;
+		}
+	}
+	
 	/**
 	 *  Set all transitions to enabled(true).
 	 *  <p>
 	 *  This is done at the beginning of each new iteration.
 	 */
 	private void enableAllTransitions() {
+		
 		for (Transition transition : this.transitionList) {
+			
 			transition.setEnabledStatus(true);
 		}
 	}
@@ -405,5 +438,6 @@ protected String name = "Untitled";
 			arc.update();
 		}
 	}
-
+	
+	
 }

@@ -38,12 +38,30 @@ import hybridPetriNet.Places.Place;
 public class ContinuousTimeTransition extends Transition {
 		
 	/**
+	 * Keys to retrieve values from the markingsMap of a Petri net, which
+	 * may be used to store constants.
+	 * <p>
+	 * This variable is used to make the firing function of the transition
+	 * a function of the markings in a place (can be multiple).
+	 */
+	private String[] variableKeys;
+	
+	/**
+	 * This variable stores the firing function as a string, if it is not a
+	 * constant.
+	 * <p>
+	 * It is parsed and evaluated at each update call.
+	 */
+	String firingFunctionString;
+	
+	/**
 	 * @param name
 	 * @param priority = 1
 	 * @param firingFunction = 1
 	 */
 	public ContinuousTimeTransition(String name) {
 		super(name);
+		this.firingFunctionString = "1";
 	}
 
 	/**
@@ -53,6 +71,7 @@ public class ContinuousTimeTransition extends Transition {
 	 */
 	public ContinuousTimeTransition(String name, int priority) {
 		super(name, priority);
+		this.firingFunctionString = "1";
 	}
 
 	/**
@@ -62,6 +81,28 @@ public class ContinuousTimeTransition extends Transition {
 	 */
 	public ContinuousTimeTransition(String name, int priority, double firingFunction) {
 		super(name, priority, firingFunction);
+		this.firingFunctionString = String.valueOf(firingFunction);
+	}
+	
+	/**
+	 * @param name
+	 * @param firingFunction
+	 * @param priority = 1
+	 */
+	public ContinuousTimeTransition(String name, double firingFunction){
+		super(name, firingFunction);
+		this.firingFunctionString = String.valueOf(firingFunction);
+	}
+	
+	/**
+	 * @param name
+	 * @param firingFunction
+	 * @param priority = 1
+	 */
+	public ContinuousTimeTransition(String name, String firingFunctionExpression){
+		super(name);
+		this.firingFunctionString = String.valueOf(firingFunction);
+		this.firingFunction = 
 	}
 		
 	/**
@@ -81,6 +122,24 @@ public class ContinuousTimeTransition extends Transition {
 		else {
 			throw new UnsupportedOperationException(
 					"Transition not enabled, did not fire.");
-		}
+		}		 
 	}
+	
+	/**
+	 * The update method is used to create a function that changes the
+	 * properties of the elements at each TIME ADVANCEMENT.
+	 */
+	@Override
+	public void update(){
+		
+	}
+	
+	/**
+	 * Get the variables' keys.
+	 * @return keys
+	 */
+	public String[] getVariableKeys() {
+		return this.variableKeys;
+	}
+	
 }

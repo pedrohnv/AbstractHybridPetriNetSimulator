@@ -70,6 +70,7 @@ public class Transition implements Comparable <Transition> {
 		this.index = counter.incrementAndGet();
 		this.priority = 1;
 		this.firingFunction = 1;
+		this.enabledStatus = true;
 	}
 	
 	/**
@@ -82,6 +83,20 @@ public class Transition implements Comparable <Transition> {
 		this.index = counter.incrementAndGet();
 		this.priority = priority;
 		this.firingFunction = 1;
+		this.enabledStatus = true;
+	}
+	
+	/**
+	 * @param name
+	 * @param firingFunction
+	 * @param priority = 1
+	 */
+	public Transition (String name, double firingFunction) {
+		this.name = name;
+		this.index = counter.incrementAndGet();
+		this.priority = 1;
+		this.firingFunction = firingFunction;
+		this.enabledStatus = true;
 	}
 	
 	/**
@@ -94,6 +109,7 @@ public class Transition implements Comparable <Transition> {
 		this.index = counter.incrementAndGet();
 		this.firingFunction = firingFunction;
 		this.priority = priority;
+		this.enabledStatus = true;
 	}
 	
 	/*
@@ -116,7 +132,8 @@ public class Transition implements Comparable <Transition> {
 	 * mutators
 	 */
 	/**
-	 *  This method is used inside an arc method.
+	 *  Change transition status to:
+	 *  @param status
 	 */
 	public void setEnabledStatus(boolean status) {
 		this.enabledStatus = status;		

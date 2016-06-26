@@ -93,7 +93,7 @@ public class TestArc extends Arc {
 
 		boolean disableTransition = false; 
 		
-		if  (this.place.getMarkings() < testThreshold) {
+		if  (this.place.getMarkings() <= testThreshold) {
 			disableTransition = true;
 		}
 		
@@ -108,6 +108,7 @@ public class TestArc extends Arc {
 	 * <p>
 	 * The final value will be achieved using a boolean OR function.
 	 */
+	@Override
 	public boolean finalDisablingFunction() {		
 		boolean disableTransition = false;
 		
@@ -119,7 +120,7 @@ public class TestArc extends Arc {
 			disableTransition = true;
 		}
 		
-		// put here other disabling functions testing
+		// Override put here other disabling functions testing
 		
 		return disableTransition;
 	}

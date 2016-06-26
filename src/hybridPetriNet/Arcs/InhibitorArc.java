@@ -78,17 +78,19 @@ public class InhibitorArc extends TestArc {
 	
 	/** 
 	 * The inhibitor arc disabling function: tests if the markings in the
-	 * place are GREATER than a threshold.
+	 * place are GREATER or equal than a threshold.
 	 */
+	@Override
 	public boolean thresholdDisablingFunction() {
 
 		boolean disableTransition = false; 
 		
-		if  (this.place.getMarkings() > testThreshold) {
+		if  (this.place.getMarkings() >= testThreshold) {
 			disableTransition = true;
 		}
 		
 		return disableTransition; 
 	}
+		
 
 }

@@ -50,7 +50,7 @@ import hybridPetriNet.Transitions.Transition;
  * <p>
  * Transition -> place, weight > 0.
  */
-public class Arc implements Comparable<Arc> {
+public class Arc implements Comparable <Arc> {
 	
 	protected String name;
 	protected double weight;
@@ -97,8 +97,8 @@ public class Arc implements Comparable<Arc> {
 		this.weight = 1;
 	}
 	/**
-	 * @param p6
-	 * @param t6
+	 * @param place
+	 * @param transition
 	 * @param weight
 	 */
 	public Arc(Place place, Transition transition, double weight) {
@@ -170,7 +170,7 @@ public class Arc implements Comparable<Arc> {
 	 * after the firing of the associated transition, will remain inside
 	 * the capacity of the place.
 	 */
-	public final boolean defaultDisablingFunction() {		
+	protected final boolean defaultDisablingFunction() {		
 		// the final declaration prevents overriding
 		double newValue = this.place.newMarkingsValue(
 				this.transition.getFiringFunction(), this.weight);
@@ -187,15 +187,15 @@ public class Arc implements Comparable<Arc> {
 	 * be false).
 	 * <p>
 	 * The final value will be achieved using a boolean OR function.
-	 */
-	private boolean finalDisablingFunction() {		
+	 */	
+	public boolean finalDisablingFunction() {		
 		boolean disableTransition = false;
 		
 		if (this.defaultDisablingFunction()){
 			disableTransition = true;					
 		}
 		
-		// put here other disabling functions testing
+		// Override put here other disabling functions testing
 		
 		return disableTransition;
 	}
@@ -207,9 +207,9 @@ public class Arc implements Comparable<Arc> {
 	 *  In the behavior of the net, all transitions will have their enabled
 	 *  status set to TRUE at the beginning of each iteration.
 	 */
-	public void setTransitionStatus() {
+	public final void setTransitionStatus() {
 		
-		if (this.finalDisablingFunction()) {		
+		if (this.finalDisablingFunction()) {
 			
 			this.transition.setEnabledStatus(false);
 		}			

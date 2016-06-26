@@ -27,6 +27,7 @@ package hybridPetriNet.Places;
  * This is a continuous place. Markings may be any real number.
  */
 public class ContinuousPlace extends Place {	
+		
 	/*
 	 * Constructors
 	 */
