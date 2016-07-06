@@ -41,38 +41,9 @@ import hybridPetriNet.Transitions.Transition;
  */
 public class TestArc extends Arc {
 	
-	protected double testThreshold = 1; 
+	protected Double testThreshold = 1.0;
+	protected String testThresholdString;
 	
-	/** 
-	 * @param place
-	 * @param transition
-	 * @param testThreshold
-	 */
-	public TestArc(Place place, Transition transition, 
-				double testThreshold) {
-		super(place, transition, 0.0);
-		this.testThreshold = testThreshold;
-	}
-	/**	
-	 * @param place
-	 * @param transition
-	 * @param testThresold = 1
-	 */
-	public TestArc(Place place, Transition transition) {
-		super(place, transition, 0.0);
-	}
-	
-	/**
-	 * @param name
-	 * @param place
-	 * @param transition
-	 * @param testThresold = 1
-	 */
-	public TestArc(String name, Place place,
-				Transition transition) {
-		super(name, place, transition, 0.0);
-	}
-
 	/**
 	 * @param name
 	 * @param place
@@ -80,9 +51,64 @@ public class TestArc extends Arc {
 	 * @param testThreshold
 	 */
 	public TestArc(String name, Place place, Transition transition, 
-			double testThreshold) {
+			Double testThreshold) {
 		super(name, place, transition, 0.0);
 		this.testThreshold = testThreshold;
+		this.testThresholdString = testThreshold.toString();
+	}
+	
+	/** 
+	 * @param place
+	 * @param transition
+	 * @param testThreshold
+	 */
+	public TestArc(Place place, Transition transition, Double testThreshold) {
+		super(place, transition, 0.0);
+		this.testThreshold = testThreshold;
+		this.testThresholdString = testThreshold.toString();
+	}
+	
+	/**
+	 * @param name
+	 * @param place
+	 * @param transition
+	 * @param testThreshold
+	 */
+	public TestArc(String name, Place place, Transition transition, 
+			String testThreshold) {
+		super(name, place, transition, 0.0);
+		this.testThresholdString = testThreshold;
+	}
+	
+	/** 
+	 * @param place
+	 * @param transition
+	 * @param testThreshold
+	 */
+	public TestArc(Place place, Transition transition, String testThreshold) {
+		super(place, transition, 0.0);
+		this.testThresholdString = testThreshold;
+	}
+	
+	/**	
+	 * @param place
+	 * @param transition
+	 * @param testThresold = 1
+	 */
+	public TestArc(Place place, Transition transition) {
+		super(place, transition, 0.0);
+		this.testThresholdString = this.weight.toString();
+	}
+	
+	/**
+	 * @param name
+	 * @param place
+	 * @param transition
+	 * @param testThresold = 1
+	 */
+	public TestArc(String name, Place place, Transition transition) {
+		super(name, place, transition, 0.0);
+		this.testThresholdString = this.weight.toString();
 	}
 	
 	/** 
@@ -124,5 +150,13 @@ public class TestArc extends Arc {
 		
 		return disableTransition;
 	}
-
+	
+	/**
+	 * The update method is used to create a function that changes the
+	 * properties of the elements at each ITERATION advancement.
+	 */
+	public void iterationUpdate() {
+		// evaluate the weight (if it is a function).
+		this.testThreshold = evaluator.evaluate(this.testThresholdString);
+	}
 }

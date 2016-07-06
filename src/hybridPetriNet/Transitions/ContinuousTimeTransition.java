@@ -1,5 +1,5 @@
 /**
- * The MIT License (MIT)
+The MIT License (MIT)
 
 Copyright (c) 2016 Pedro Henrique Nascimento Vieira
 
@@ -19,7 +19,6 @@ FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR
 COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
 IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
-
  */
 package hybridPetriNet.Transitions;
 
@@ -36,110 +35,107 @@ import hybridPetriNet.Places.Place;
  * corresponding to its firing function in ONE time step.
  */
 public class ContinuousTimeTransition extends Transition {
-		
+			
 	/**
-	 * Keys to retrieve values from the markingsMap of a Petri net, which
-	 * may be used to store constants.
-	 * <p>
-	 * This variable is used to make the firing function of the transition
-	 * a function of the markings in a place (can be multiple).
-	 */
-	private String[] variableKeys;
-	
-	/**
-	 * This variable stores the firing function as a string, if it is not a
-	 * constant.
-	 * <p>
-	 * It is parsed and evaluated at each update call.
-	 */
-	String firingFunctionString;
-	
-	/**
+	 * The inputed firing function is multiplied by the time step during the
+	 * simulation.
 	 * @param name
 	 * @param priority = 1
 	 * @param firingFunction = 1
 	 */
 	public ContinuousTimeTransition(String name) {
 		super(name);
-		this.firingFunctionString = "1";
 	}
 
 	/**
+	 * The inputed firing function is multiplied by the time step during the
+	 * simulation.
 	 * @param name
 	 * @param priority
 	 * @param firingFunction = 1
 	 */
 	public ContinuousTimeTransition(String name, int priority) {
 		super(name, priority);
-		this.firingFunctionString = "1";
 	}
 
 	/**
+	 * The inputed firing function is multiplied by the time step during the
+	 * simulation.
 	 * @param name
 	 * @param priority
 	 * @param firingFunction
 	 */
 	public ContinuousTimeTransition(String name, int priority, double firingFunction) {
 		super(name, priority, firingFunction);
-		this.firingFunctionString = String.valueOf(firingFunction);
 	}
 	
 	/**
+	 * The inputed firing function is multiplied by the time step during the
+	 * simulation.
 	 * @param name
 	 * @param firingFunction
 	 * @param priority = 1
 	 */
 	public ContinuousTimeTransition(String name, double firingFunction){
 		super(name, firingFunction);
-		this.firingFunctionString = String.valueOf(firingFunction);
+		this.firingFunctionString = String.valueOf( firingFunction );
 	}
 	
 	/**
+	 * The inputed firing function is multiplied by the time step during the
+	 * simulation.
 	 * @param name
 	 * @param firingFunction
 	 * @param priority = 1
 	 */
 	public ContinuousTimeTransition(String name, String firingFunctionExpression){
 		super(name);
-		this.firingFunctionString = String.valueOf(firingFunction);
-		this.firingFunction = 
-	}
-		
-	/**
-	 *  This method fires the transition. That is, changes the markings in
-	 *  a place according to the arc weight and transition's firing.
-	 *  <p>
-	 *  The transition will fire only in the first iteration.
-	 */	
-	public void fire(Place place, double weight){
-		
-		 if (this.enabledStatus && (Evolution.getIteration() == 0)) {
-			/*
-			 *  if invalid new marking, exception is thrown.
-			 */
-			 place.changeMarkings(this.firingFunction, weight);			
-		}
-		else {
-			throw new UnsupportedOperationException(
-					"Transition not enabled, did not fire.");
-		}		 
+		// firing function is initially (default) set to 1. Before the first
+		// iteration it should be updated to it's true value.
+		this.firingFunctionString = firingFunctionExpression;
 	}
 	
 	/**
-	 * The update method is used to create a function that changes the
-	 * properties of the elements at each TIME ADVANCEMENT.
+	 * The inputed firing function is multiplied by the time step.
+	 * @param name
+	 * @param firingFunction
+	 * @param priority
+	 */
+	public ContinuousTimeTransition(String name, String firingFunctionExpression,
+								int priority){
+		super(name);
+		// firing function is initially (default) set to 1. Before the first
+		// iteration it should be updated to it's true value.
+				
+		this.firingFunctionString = firingFunctionExpression;
+		this.priority = priority;
+	}
+		
+	/**
+	 *  This method is used inside an arc method.
+	 *  <br>
+	 *  Enables the transition only if it's the zeroth iteration.
 	 */
 	@Override
-	public void update(){
+	public void setEnabledStatus(boolean status) {
 		
+		if (Evolution.getIteration() > 0) { 
+			this.enabledStatus = false;
+		}	
+		else if (status){
+			this.enabledStatus = true;
+		}
 	}
 	
 	/**
-	 * Get the variables' keys.
-	 * @return keys
+	 * The continuous transition's firing does an integration based on it's
+	 * firing speed.
+	 * <p>
+	 * This method multiplies the firing function by the time step.
 	 */
-	public String[] getVariableKeys() {
-		return this.variableKeys;
+	@Override
+	public void fire(Place place, double weight) {
+		Double adjustedFiringFunction = this.firingFunction * Evolution.getTimeStep(); 
+		place.changeMarkings(adjustedFiringFunction, weight);
 	}
-	
 }

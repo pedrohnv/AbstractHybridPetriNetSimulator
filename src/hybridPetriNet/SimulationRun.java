@@ -27,16 +27,14 @@ import java.io.FileNotFoundException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Map;
 import java.util.Set;
 
 import hybridPetriNet.PetriNets.PetriNet;
 import hybridPetriNet.Places.Place;
 import hybridPetriNet.Arcs.Arc;
 import hybridPetriNet.Transitions.Transition;
-import userInteraction.LogText;
+import utilities.LogText;
 
 /**
  * Simulate the Petri net.
@@ -144,6 +142,8 @@ public abstract class SimulationRun {
 		
 	/**
 	 * Append new results to stringResults of Program Run.
+	 * <p>
+	 * Only a time multiple of the timeSampling is appended.
 	 * @param Petri net being simulated
 	 */
 	private static void appendResults(PetriNet net){
@@ -151,6 +151,7 @@ public abstract class SimulationRun {
 		 *  use by multiple threads. If such synchronization is required then
 		 *  it is recommended that StringBuffer be used.
 		 */
+				
 		StringBuilder strBuilder = new StringBuilder(stringResults);
 		
 		for (Place Place : net.getPlaces()) {
@@ -171,6 +172,8 @@ public abstract class SimulationRun {
 			strBuilder.append('\n'); // new line character
 		}		 		 
 		stringResults = strBuilder.toString();
+		
+		
 	}
 	
 	/**
@@ -205,25 +208,34 @@ public abstract class SimulationRun {
 		Evolution.setIteration(0);
 			
 		while (Evolution.getIteration() <= Evolution.getMaxIterations()){				
-					
-			parentNet.testLivelock();
 			
+			parentNet.iterationUpdateElements();
+			
+			parentNet.testLivelock();
+						
 			// if livelocked, break the loop, stop simulation
 			if (parentNet.isLivelocked()){
 				LogText.appendMessage("livelocked");
 				break;
 			}
 			
+			parentNet.iterateNet();	
+			
 			parentNet.testDeadlock();
 						
 			// if deadlocked, break the loop, stop simulation
 			if (parentNet.isDeadlocked()){
-				LogText.appendMessage("deadlocked");
-				break;
-			}
-						
-			parentNet.iterateNet();		
-			
+
+				if (parentNet.testWaitingTimePassing()) {
+					// the deadlock is due to a transition waiting time to pass
+					// the testWaitingTimePassing signals false to the deadlock
+					break;
+				}
+				else {
+					LogText.appendMessage("deadlocked");
+					break;
+				}
+			}			
 			Evolution.updateIteration();
 							
 			/*
@@ -248,7 +260,9 @@ public abstract class SimulationRun {
 		
 		// will run until the final time is reached
 		while(Evolution.getTime() <= Evolution.getFinalTime()) {
-						
+			
+			parentNet.timeUpdateElements();
+			
 			if (parentNet.isDeadlocked() || parentNet.isLivelocked()){
 				// if deadlocked or livelocked, stop simulation
 				break;
@@ -258,7 +272,6 @@ public abstract class SimulationRun {
 			
 			Evolution.updateTime();
 			
-			parentNet.updateElements();
 		}		
 		// save simulation results to csv file
 		generateCsvFile(stringResults);		
@@ -280,53 +293,5 @@ public abstract class SimulationRun {
 		
 		LogText.appendMessage("simulation ended");
 	}
-	
-	/**
-	 * A map of the places' markings. To be used during runtime,
-	 * especially to update objects.
-	 * <p>
-	 * If some arbitrary constant must be used in the net, create an
-	 * isolated place with the markings value you want to be the constant. 
-	 * <p>
-	 * (String) key = "place + place.index"
-	 * <p>
-	 * (Double) value = place.markingss.
-	 */
-	private static Map <String, Double> markingsMap = new HashMap <String, Double>();
-	
-	/**
-	 * Returns the map of markings.
-	 */
-	public Map <String, Double> getMarkingsMap() {
-		return markingsMap;
-	}
-	
-	/**
-	 * Populate map (updating if non-empty).
-	 */
-	public void populateMarkingsMap(PetriNet net){
 		
-		String key;
-		
-		/*
-		 *  This loop set the keys ("place" + index) to the map, each with
-		 *  the corresponding values (place markings).
-		 */
-		for (Place place : net.getPlaces()) {		
-			
-			key = ("place" + place.getIndex());
-			
-			markingsMap.put(key, place.getMarkings());
-		}
-	}
-	
-	/**
-	 * Get the value of the markings given a key (place + index).
-	 * @param key
-	 * @return markings
-	 */
-	public Double getMarkingValue(String key) {
-		return markingsMap.get(key);
-	}
-	
 }

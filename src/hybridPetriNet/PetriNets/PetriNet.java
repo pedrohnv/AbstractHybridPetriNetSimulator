@@ -33,9 +33,10 @@ import hybridPetriNet.Evolution;
 import hybridPetriNet.Arcs.Arc;
 import hybridPetriNet.Places.Place;
 import hybridPetriNet.Transitions.Transition;
+import utilities.AdaptedEvaluator;
+import utilities.LogText;
 import hybridPetriNet.Transitions.ContinuousTimeTransition;
 import hybridPetriNet.Transitions.TimeDelayedTransition;
-import userInteraction.LogText;
 
 /** 
  * This class implements and defines the behavior of the hybrid Petri net.
@@ -357,32 +358,55 @@ public class PetriNet {
 	 * OR if the only enabled transitions are waiting for time to pass
 	 * because of a delay (or the firing function is a function of time,
 	 * i.e., continuous transitions); also flag a deadlock.
+	 * <p>
+	 * This functions also declares if waitingTime to pass or not.
 	 */	
-	public void testDeadlock() {	
+	public void testDeadlock() {
 		
 		boolean deadlock = true;
 				
 		for (Transition transitionInList : this.transitionList) {			
-						
-			boolean enabled = transitionInList.getEnabledStatus();
-			
-			boolean continuous = transitionInList instanceof ContinuousTimeTransition;
-			
-			boolean timeDelayed = transitionInList instanceof TimeDelayedTransition;
-			
-			boolean notNullFiring = (transitionInList.getFiringFunction() != 0.0);
-			
-			boolean notNullDelayed = (timeDelayed && notNullFiring);
-			
-			if ( enabled || continuous || notNullDelayed ){
+					
+			if ( transitionInList.getEnabledStatus() ){
 				// a transition is enabled or waiting time to pass
 				deadlock = false;
 				break;
-			}			
+			}						
 		}		
 		this.deadlocked = deadlock;
 	}
 	
+	/**
+	 * Test if the deadlock is due to transitions waiting for time to pass.
+	 * <br>
+	 * Should be called if a deadlock is detected.
+	 * <br>
+	 * If true to timeWaiting, signals false to a deadlock.
+	 * <p>
+	 * If new kind of transitions, that deadlock on iterations but not on time
+	 * (i.e., waits for time to pass before enabling), is added, override this
+	 * method to include them.
+	 */
+	public boolean testWaitingTimePassing() {
+		
+		boolean waiting = false;
+		
+		for (Transition transitionInList : this.transitionList) {			
+			
+			if ( transitionInList instanceof ContinuousTimeTransition ||
+					transitionInList instanceof TimeDelayedTransition ){
+				
+				waiting = true;
+				this.deadlocked = false;
+				break;
+			}						
+		}			
+		return waiting;		
+	}
+	
+	/**
+	 * Sees if the maximum iteration was reached.
+	 */
 	public void testLivelock(){
 		if (Evolution.getIteration() == Evolution.getMaxIterations()) {
 						
@@ -426,18 +450,80 @@ public class PetriNet {
 		this.fireNet();
 	}
 	
-	public void updateElements() {
+	/**
+	 * Update all elements at each time.
+	 */
+	public void timeUpdateElements() {
+		
+		this.populateMarkingsMap();
+		
+		// shows the evaluator the map in which it should look for variables
+		AdaptedEvaluator.setMap(this.markingsMap);
+		
 		// update all elements in the net
 		for (Place place : this.placeList){
-			place.update();
+			place.timeUpdate();
 		}
 		for (Transition transition : this.transitionList){
-			transition.update();
+			transition.timeUpdate();
 		}
 		for (Arc arc : this.arcList){
-			arc.update();
+			arc.timeUpdate();
 		}
 	}
 	
+	/**
+	 * Update all elements at each iteration.
+	 */
+	public void iterationUpdateElements() {
+		
+		this.populateMarkingsMap();
+		
+		// shows the evaluator the map in which it should look for variables
+		AdaptedEvaluator.setMap(this.markingsMap);
+		
+		// update all elements in the net
+		for (Place place : this.placeList){
+			place.iterationUpdate();
+		}
+		for (Transition transition : this.transitionList){
+			transition.iterationUpdate();
+		}
+		for (Arc arc : this.arcList){
+			arc.iterationUpdate();
+		}
+	}
+	
+	/**
+	 * A map of the places' markings. To be used during runtime
+	 * to update objects.
+	 * <p>
+	 * If some arbitrary constant must be used in the net, create an
+	 * isolated place with the markings value you want to be the constant. 
+	 * <p>
+	 * (String) key = variable name
+	 * <p>
+	 * (Double) value = place markings.
+	 */
+	private Map <String, Double> markingsMap = new HashMap <String, Double>();
+	
+	/**
+	 * Populate map (updating if non-empty).
+	 */
+	private void populateMarkingsMap(){
+		
+		String key;
+		
+		/*
+		 *  This loop set the keys to the map, each with
+		 *  the corresponding values (place markings).
+		 */
+		for (Place place : this.placeList) {		
+			
+			key = place.getVariableName();
+			
+			this.markingsMap.put(key, place.getMarkings());
+		}
+	}
 	
 }

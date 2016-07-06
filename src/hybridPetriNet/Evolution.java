@@ -29,24 +29,30 @@ package hybridPetriNet;
  */
 public abstract class Evolution {
 	
-	private static double time = 0;
+	private static Double time = 0.0;
 	
 	/** Up to what time should the program run?*/
-	private static double finalTime = 1;
+	private static Double finalTime = 10.0;
 	
-	/** Make the timeStep a common divisor of all time constants in the net.
+	/** 
+	 * Make the timeStep a common divisor of all time constants in the net.
+	 * <br>
+	 * It is a integration step that defines the smallest time advancement
+	 * captured by the net. Smaller means more accuracy, but greater processing
+	 * time.
 	 * <p>
-	 * It is alsu used as the integration step.
+	 * Some errors may appear for using a value too small. 
 	 */
-	private static double timeStep = 1;
+	private static Double timeStep = 1e-10;
+	
 	/* TODO add dynamic time step. Make it be the smallest value to which a
  	 * change in the net occurs (a transition is enabled or disabled).
  	 */
-			
-	private static int iteration = 0;
+		
+	private static Integer iteration = 0;
 	
 	/** This is used to end the program, considering a net livelocked.*/
-	private static int maxIterations = (int) 1e6;
+	private static Integer maxIterations = (int) 1e6;
 		
 	/*
 	 * accessors 
@@ -54,12 +60,12 @@ public abstract class Evolution {
 	/** 
 	 * @return current time
 	 */
-	public static double getTime(){return Evolution.time;}
+	public static Double getTime(){return Evolution.time;}
 	
 	/** 
 	 * @return time step
 	 */
-	public static double getTimeStep(){return Evolution.timeStep;}
+	public static Double getTimeStep(){return Evolution.timeStep;}
 	
 	/** 
 	 * @return ending time
@@ -69,26 +75,26 @@ public abstract class Evolution {
 	/** 
 	 * @return current iteration
 	 */
-	public static int getIteration(){return Evolution.iteration;}
+	public static Integer getIteration(){return Evolution.iteration;}
 	
 	/** 
 	 * @return number of iterations to consider livelock.
 	 */
-	public static int getMaxIterations(){return Evolution.maxIterations;}
+	public static Integer getMaxIterations(){return Evolution.maxIterations;}
 	
 	/*
 	 * mutators 
 	 */	
 	/**
-	 * change current time
+	 * Set current time and iteration to zero.
 	 */
 	public static void reset() {
 		Evolution.iteration = 0;
-		Evolution.time = 0;
+		Evolution.time = 0.0;
 	}
 	
 	/** Change the current iteration*/
-	public static void setIteration(int newIteration){
+	public static void setIteration(Integer newIteration){
 		Evolution.iteration = newIteration;}
 	
 	/** Change the time step*/
@@ -104,7 +110,7 @@ public abstract class Evolution {
 		Evolution.finalTime = newFinalTime;}
 		
 	/** Change the maximum number of iterations to consider livelock*/
-	public static void setMaxIterations(int newMaxIterations){
+	public static void setMaxIterations(Integer newMaxIterations){
 		Evolution.maxIterations = newMaxIterations;}
 		
 	/*

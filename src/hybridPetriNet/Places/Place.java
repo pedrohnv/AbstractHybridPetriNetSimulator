@@ -51,8 +51,8 @@ public class Place implements Comparable<Place> {
 	 *  All objects extending the Abstract super class should have a unique
 	 *  index.
 	 */
-	protected final int index;
-		
+	protected final Integer index;
+	
 	/* 
      * constructors
      */   
@@ -66,6 +66,7 @@ public class Place implements Comparable<Place> {
     	this.name= name;
 		this.markings = 0;
 		this.capacity = new double[] {0.0, Double.POSITIVE_INFINITY};
+		this.variableName = "p" + index.toString();
 	}
 	
     /**
@@ -78,6 +79,7 @@ public class Place implements Comparable<Place> {
     	this.name= name;
 		this.markings = markings;
 		this.capacity = new double[] {0.0, Double.POSITIVE_INFINITY};
+		this.variableName = "p" + index.toString();
 	}
 	
 	/**
@@ -90,6 +92,7 @@ public class Place implements Comparable<Place> {
     	this.name= name;
 		this.markings = markings;
 		this.changeCapacity(capacity); // call mutator
+		this.variableName = "p" + index.toString();
 	}
 
 	
@@ -219,9 +222,15 @@ public class Place implements Comparable<Place> {
 	
 	/**
 	 * The update method is used to create a function that changes the
-	 * properties of the elements at each TIME ADVANCEMENT.
+	 * properties of the elements at each TIME advancement.
 	 */
-	public void update() {}
+	public void timeUpdate() {}
+	
+	/**
+	 * The update method is used to create a function that changes the
+	 * properties of the elements at each ITERATION advancement.
+	 */
+	public void iterationUpdate() {}
 	
 	/**
 	 * To organize results in the simulation
@@ -235,5 +244,24 @@ public class Place implements Comparable<Place> {
 		
 		return ( this.getIndex() - other.getIndex() );
 	}
+	
+	/**
+	 * This field should be unique to each object. Used to be more convenient
+	 * to refer to the markings as variables in equations.
+	 * <p>
+	 * Default is "p + index".
+	 */
+	private String variableName;
+	//TODO ensure unique variableNames among objects.
+	
+	public void setVariableName(String name) {
+		this.variableName = name;
+	}
+	
+	public String getVariableName() {
+		return this.variableName;
+	}
+	
+
 	
 }

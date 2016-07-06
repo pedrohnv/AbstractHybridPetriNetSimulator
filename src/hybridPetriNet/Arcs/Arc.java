@@ -27,6 +27,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import hybridPetriNet.Places.Place;
 import hybridPetriNet.Transitions.Transition;
+import utilities.AdaptedEvaluator;
 
 /** 
  * The default arc is a normal one.
@@ -53,9 +54,19 @@ import hybridPetriNet.Transitions.Transition;
 public class Arc implements Comparable <Arc> {
 	
 	protected String name;
-	protected double weight;
+	protected Double weight;
 	protected Place place;
 	protected Transition transition;
+
+	/**
+	 * Weight stored as a String. To be evaluated at each update.
+	 */
+	protected String weightString;
+	
+	/**
+	 * The expression (string) evaluator
+	 */
+	protected static AdaptedEvaluator evaluator = new AdaptedEvaluator();
 	
 	// atomic integer because of multithreading
 	private static AtomicInteger counter = new AtomicInteger(0);
@@ -64,7 +75,7 @@ public class Arc implements Comparable <Arc> {
 	 *  All objects extending the  super class should have a unique
 	 *  index.
 	 */
-	protected int index;
+	protected Integer index;
 	
     /*
 	 * constructors
@@ -80,7 +91,8 @@ public class Arc implements Comparable <Arc> {
 		this.place = place;
 		this.transition = transition;
 		this.index = counter.incrementAndGet();
-		this.weight = -1;
+		this.weight = -1.0;
+		this.weightString = "-1.0";
 	}
 	
 	/**
@@ -94,18 +106,33 @@ public class Arc implements Comparable <Arc> {
 		this.place = place;
 		this.transition = transition;
 		this.index = counter.incrementAndGet();
-		this.weight = 1;
+		this.weight = 1.0;
+		this.weightString = "1.0";
 	}
+	
 	/**
 	 * @param place
 	 * @param transition
 	 * @param weight
 	 */
-	public Arc(Place place, Transition transition, double weight) {
+	public Arc(Place place, Transition transition, Double weight) {
 		this.place = place;
 		this.transition = transition;
 		this.index = counter.incrementAndGet();
 		this.weight = weight;
+		this.weightString = weight.toString();
+	}
+	
+	/**
+	 * @param place
+	 * @param transition
+	 * @param weight
+	 */
+	public Arc(Place place, Transition transition, String weight) {
+		this.place = place;
+		this.transition = transition;
+		this.index = counter.incrementAndGet();
+		this.weightString = weight;
 	}
 
 	/**
@@ -114,13 +141,27 @@ public class Arc implements Comparable <Arc> {
 	 * @param transition
 	 * @param weight
 	 */
-	public Arc(String name, Place place, Transition transition,
-			double weight) {
+	public Arc(String name, Place place, Transition transition, Double weight) {
 		this.place = place;
 		this.transition = transition;
 		this.index = counter.incrementAndGet();	
 		this.name = name;
 		this.weight = weight;
+		this.weightString = weight.toString();
+	}
+	
+	/**
+	 * @param name
+	 * @param place
+	 * @param transition
+	 * @param weight
+	 */
+	public Arc(String name, Place place, Transition transition, String weight) {
+		this.place = place;
+		this.transition = transition;
+		this.index = counter.incrementAndGet();	
+		this.name = name;
+		this.weightString = weight;
 	}
 	
 	
@@ -135,9 +176,9 @@ public class Arc implements Comparable <Arc> {
 	
 	public Transition getTransition() {return this.transition;}
 	
-	public int getIndex() {return this.index;}
+	public Integer getIndex() {return this.index;}
 	
-	public double getWeight() {return this.weight;}
+	public Double getWeight() {return this.weight;}
 	
 	
 	/*
@@ -161,7 +202,8 @@ public class Arc implements Comparable <Arc> {
 	 * Check if arc already exists (an arc that connect the same place and
 	 * transition as another).
 	 */
-	public void checkExistance(){
+	@SuppressWarnings("unused")
+	private void checkExistance(){
 		//TODO
 	}
 	
@@ -245,25 +287,33 @@ public class Arc implements Comparable <Arc> {
 	 *  the place in this arc, according to its weight and transition's
 	 *  firing function.
 	 *  <p>
-	 *  if is a timed transition and is not the first iteration, stop
-	 *  execution.
-	 *  <p>
-	 *  if the transition is enabled, fire; else, throw exception.
+	 *  if the transition is enabled, fire.
 	 */	
 	public void fireTransition() {
 		
 		if (this.transition.getEnabledStatus()){
-		
-			this.place.changeMarkings(this.transition.getFiringFunction(),
-				this.weight);	
+			
+			this.transition.fire(this.place, this.weight);			
 		}
 	}
 		
 	
 	/**
 	 * The update method is used to create a function that changes the
-	 * properties of the elements at each TIME ADVANCEMENT.
+	 * properties of the elements at each TIME advancement.
 	 */
-	public void update(){}
+	public void timeUpdate(){
+		// evaluate the weight (if it is a function).
+		this.weight = evaluator.evaluate(this.weightString);
+	}
+	
+	/**
+	 * The update method is used to create a function that changes the
+	 * properties of the elements at each ITERATION advancement.
+	 */
+	public void iterationUpdate() {
+		// evaluate the weight (if it is a function).
+		this.weight = evaluator.evaluate(this.weightString);
+	}
 	
 }

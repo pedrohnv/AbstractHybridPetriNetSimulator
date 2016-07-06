@@ -93,7 +93,7 @@ public class TimeDelayedTransition extends Transition {
 	public TimeDelayedTransition(String name, double delay, 
 				double delayedFiringFunction) {
 		super(name);
-		this.delayedFiringFunction = this.firingFunction;
+		this.delayedFiringFunction = delayedFiringFunction;
 		this.firingFunction = 0.0;
 		this.delay = delay;
 	}
@@ -106,9 +106,9 @@ public class TimeDelayedTransition extends Transition {
 	 * @param firingFunction = 0
 	 */
 	public TimeDelayedTransition(String name, double delay, 
-				double delayedFiringFunction, int priority) {
+				Double delayedFiringFunction, int priority) {
 		super(name);
-		this.delayedFiringFunction = this.firingFunction;
+		this.delayedFiringFunction = delayedFiringFunction;
 		this.firingFunction = 0.0;
 		this.delay = delay;
 		this.priority = priority;
@@ -124,11 +124,11 @@ public class TimeDelayedTransition extends Transition {
 	 * @param firingFunction
 	 */
 	public TimeDelayedTransition(String name, double delay, 
-				double delayedFiringFunction, int priority,
-				double firingFunction) {
+				Double delayedFiringFunction, int priority,
+				Double firingFunction) {
 		super(name);
-		this.delayedFiringFunction = this.firingFunction;
-		this.firingFunction = 0.0;
+		this.delayedFiringFunction = delayedFiringFunction;
+		this.firingFunction = firingFunction;
 		this.delay = delay;
 		this.priority = priority;
 	}
@@ -157,9 +157,12 @@ public class TimeDelayedTransition extends Transition {
 	/**
 	 *  This method is used inside an arc method.
 	 */
+	@Override
 	public void setEnabledStatus(boolean status) {
+		
 		this.enabledStatus = status;
 		
+		// order to disable
 		if (! status) { 
 			this.firingFunction = 0.0;
 			this.enabledTime = 0.0;
@@ -172,7 +175,11 @@ public class TimeDelayedTransition extends Transition {
 	 * The update method is used to create a function that changes the
 	 * properties of the elements at each TIME ADVANCEMENT.
 	 */
-	public void update(){
+	@Override
+	public void timeUpdate(){
+		// evaluate firing function
+		this.firingFunction = evaluator.evaluate(this.firingFunctionString);
+				
 		if (this.enabledStatus) {
 		this.enabledTime += Evolution.getTimeStep();
 		}

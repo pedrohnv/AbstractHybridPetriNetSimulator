@@ -34,20 +34,22 @@ public class ContinuousPlace extends Place {
 	/**
 	 * @param name
 	 * @param markings = 0
-	 * @param capacity = [0, +inf]
+	 * @param capacity = [-inf, +inf]
 	 */
 	public ContinuousPlace(String name) {
 		super(name);
+		this.capacity = new double[] {Double.NEGATIVE_INFINITY, Double.POSITIVE_INFINITY};
 	}
 
 	/**
 	 * @param name
 	 * @param markings
-	 * @param capacity = [0, +inf]
+	 * @param capacity = [-inf, +inf]
 	 */
 	public ContinuousPlace(String name, double markings) {
 		super(name);
 		this.markings = markings; // did not call super because it enforces int value to markings.
+		this.capacity = new double[] {Double.NEGATIVE_INFINITY, Double.POSITIVE_INFINITY};
 	}
 
 	/**

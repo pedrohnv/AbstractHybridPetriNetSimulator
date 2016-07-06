@@ -40,11 +40,19 @@ public class InhibitorArc extends TestArc {
 	 * @param transition
 	 * @param testThreshold
 	 */
-	public InhibitorArc(Place place, Transition transition,
-							double testThreshold) {
+	public InhibitorArc(Place place, Transition transition,	Double testThreshold) {
 		super(place, transition, testThreshold);
 	}
 
+	/**
+	 * @param place
+	 * @param transition
+	 * @param testThreshold
+	 */
+	public InhibitorArc(Place place, Transition transition,	String testThreshold) {
+		super(place, transition, testThreshold);
+	}
+	
 	/**
 	 * @param place
 	 * @param transition
@@ -60,8 +68,7 @@ public class InhibitorArc extends TestArc {
 	 * @param transition
 	 * @param testThresold = 1
 	 */
-	public InhibitorArc(String name, Place place,
-			Transition transition) {
+	public InhibitorArc(String name, Place place, Transition transition) {
 		super(name, place, transition);
 	}
 
@@ -71,8 +78,19 @@ public class InhibitorArc extends TestArc {
 	 * @param transition
 	 * @param testThreshold
 	 */
-	public InhibitorArc(String name, Place place,
-			Transition transition, double testThreshold) {
+	public InhibitorArc(String name, Place place, Transition transition,
+			Double testThreshold) {
+		super(name, place, transition, testThreshold);
+	}
+	
+	/**
+	 * @param name
+	 * @param place
+	 * @param transition
+	 * @param testThreshold
+	 */
+	public InhibitorArc(String name, Place place, Transition transition,
+			String testThreshold) {
 		super(name, place, transition, testThreshold);
 	}
 	

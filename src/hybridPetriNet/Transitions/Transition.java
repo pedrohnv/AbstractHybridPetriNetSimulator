@@ -25,6 +25,9 @@ package hybridPetriNet.Transitions;
 
 import java.util.concurrent.atomic.AtomicInteger;
 
+import hybridPetriNet.Places.Place;
+import utilities.AdaptedEvaluator;
+
 /**
  * The default is a default transition.
  * <p>
@@ -45,10 +48,10 @@ import java.util.concurrent.atomic.AtomicInteger;
 public class Transition implements Comparable <Transition> {
 	
 	protected String name;
-	protected double firingFunction = 1;
-	protected int priority = 1;
-	protected boolean enabledStatus = true;
-		
+	protected Double firingFunction = 1.0;
+	protected Integer priority = 1;
+	protected Boolean enabledStatus = true;
+	
 	// atomic integer because of multithreading
 	private static AtomicInteger counter = new AtomicInteger(0);
 	
@@ -56,8 +59,22 @@ public class Transition implements Comparable <Transition> {
 	 *  All objects extending the Abstract super class should have a unique
 	 *  index.
 	 */
-	protected final int index;
-    /*
+	protected final Integer index;
+    
+	/**
+	 * This variable stores the firing function as a string, if it is not a
+	 * constant.
+	 * <p>
+	 * It is parsed and evaluated at each update call.
+	 */
+	protected String firingFunctionString;
+	
+	/**
+	 * The expression (string) evaluator
+	 */
+	protected static AdaptedEvaluator evaluator = new AdaptedEvaluator();
+	
+	/*
 	 * constructors
 	 */
 	/**
@@ -69,8 +86,9 @@ public class Transition implements Comparable <Transition> {
 		this.name = name;
 		this.index = counter.incrementAndGet();
 		this.priority = 1;
-		this.firingFunction = 1;
+		this.firingFunction = 1.0;
 		this.enabledStatus = true;
+		this.firingFunctionString = "1.0";
 	}
 	
 	/**
@@ -82,8 +100,9 @@ public class Transition implements Comparable <Transition> {
 		this.name = name;
 		this.index = counter.incrementAndGet();
 		this.priority = priority;
-		this.firingFunction = 1;
+		this.firingFunction = 1.0;
 		this.enabledStatus = true;
+		this.firingFunctionString = "1.0";
 	}
 	
 	/**
@@ -91,12 +110,13 @@ public class Transition implements Comparable <Transition> {
 	 * @param firingFunction
 	 * @param priority = 1
 	 */
-	public Transition (String name, double firingFunction) {
+	public Transition (String name, Double firingFunction) {
 		this.name = name;
 		this.index = counter.incrementAndGet();
 		this.priority = 1;
 		this.firingFunction = firingFunction;
 		this.enabledStatus = true;
+		this.firingFunctionString = String.valueOf(firingFunction);
 	}
 	
 	/**
@@ -104,12 +124,13 @@ public class Transition implements Comparable <Transition> {
 	 * @param priority
 	 * @param firingFunction
 	 */
-	public Transition (String name, int priority, double firingFunction) {
+	public Transition (String name, int priority, Double firingFunction) {
 		this.name = name;
 		this.index = counter.incrementAndGet();
 		this.firingFunction = firingFunction;
 		this.priority = priority;
 		this.enabledStatus = true;
+		this.firingFunctionString = String.valueOf(firingFunction);
 	}
 	
 	/*
@@ -186,8 +207,29 @@ public class Transition implements Comparable <Transition> {
 		
 	/**
 	 * The update method is used to create a function that changes the
-	 * properties of the elements at each TIME ADVANCEMENT.
+	 * properties of the elements at each TIME advancement.
 	 */
-	public void update(){}
-		
+	public void timeUpdate(){
+		// evaluate firing function
+		this.firingFunction = evaluator.evaluate(this.firingFunctionString);
+	}
+	
+	/**
+	 * The update method is used to create a function that changes the
+	 * properties of the elements at each ITERATION advancement.
+	 */
+	public void iterationUpdate(){
+		// evaluate firing function
+		this.firingFunction = evaluator.evaluate(this.firingFunctionString);
+		}
+
+	/**
+	 * Change the markings in a place.
+	 * @param place
+	 * @param weight
+	 */
+	public void fire(Place place, double weight) {
+
+		place.changeMarkings(this.firingFunction,weight);
+	}
 }
