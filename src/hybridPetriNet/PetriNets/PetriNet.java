@@ -62,6 +62,11 @@ public class PetriNet {
 	private boolean livelocked = false;
 	
 	/**
+	 * Use fourth (true) or second (false) order Runge-Kutta.
+	 */
+	public Boolean rk4 = false;
+	
+	/**
 	 * The places are the keys.
 	 * <p>
 	 * The values are a list of arcs that contains the place
@@ -77,6 +82,19 @@ public class PetriNet {
 	
 	private ArrayList <Arc> arcList = new ArrayList <Arc>();
 	
+	/**
+	 * A map of the places' markings. To be used during runtime
+	 * to update objects.
+	 * <p>
+	 * If some arbitrary constant must be used in the net, create an
+	 * isolated place with the markings value you want to be the constant. 
+	 * <p>
+	 * (String) key = place's variable name
+	 * <p>
+	 * (Double) value = place's markings.
+	 */
+	private Map <String, Double> markingsMap = new HashMap <String, Double>();
+		
 	/*
 	 * constructors
 	 */
@@ -195,15 +213,15 @@ public class PetriNet {
 	 * General and behavior methods
 	 */		
 	/**
-	 * Disable conflicting transitions.
+	 * Disable conflicting transitions, while checking the new marking value.
 	 * @param place
 	 * @param listedArcs
-	 * @return 
+	 * @return markingsAfterFiring
 	 */
-	private void disableConflictingTransitions(Place place,
-										ArrayList <Arc> listedArcs){
+	private double disableConflictingTransitions(Place place, double initialMarkings,
+												ArrayList <Arc> listedArcs){
 		
-		double markingsAfterFiring = place.getMarkings();
+		double markingsAfterFiring = initialMarkings;
 		
 		for (Arc arc : listedArcs){
 
@@ -225,6 +243,35 @@ public class PetriNet {
 						( transition.getFiringFunction() * arc.getWeight() );
 			}
 		}
+		return markingsAfterFiring;
+	}
+	
+	/**
+	 * Returns a list of arcs that contains given place, and have the same
+	 * weight signum as the reference's signum.
+	 * @param place
+	 * @param reference
+	 * @return shuffled then sorted list of arcs
+	 */
+	private ArrayList<Arc> getArcsByWeightSignum(Place place, double reference) {
+		
+		ArrayList <Arc> arcList = new ArrayList <Arc>();
+		
+		reference = Math.signum(reference);
+		
+		for (Arc arc : arcsMap.get(place)){
+			
+			double weightSignal = Math.signum(arc.getWeight());
+			
+			if (weightSignal == reference){
+				arcList.add(arc);
+			}
+		}
+		
+		Collections.shuffle(arcList);
+		Collections.sort(arcList);
+		
+		return arcList;
 	}
 	
 	/**
@@ -235,31 +282,22 @@ public class PetriNet {
 		
 		for (Place place : this.placeList){
 			
-			ArrayList <Arc> negativeWeightArcs =
-												new ArrayList <Arc>();
-			
-			ArrayList <Arc> positiveWeightArcs =
-												new ArrayList <Arc>();
-					
 			// make two lists of arcs, ignore zero weight arcs
-			for (Arc arc : arcsMap.get(place)){
-				if (arc.getWeight() < 0){
-					negativeWeightArcs.add(arc);
-				}
-				else if (arc.getWeight() > 0){
-					positiveWeightArcs.add(arc);
-				}
-			}			
-			Collections.shuffle(negativeWeightArcs);
-			Collections.sort(negativeWeightArcs);
+			ArrayList <Arc> negativeWeightArcs = getArcsByWeightSignum(place, -1);
 			
-			this.disableConflictingTransitions(place, negativeWeightArcs);
+			ArrayList <Arc> positiveWeightArcs = getArcsByWeightSignum(place, +1);
 			
+			/*
+			 *  TODO as it is, the firing is not considered simultaneous per se.
+			 *  As such, the negative weight arcs' transitions fire first,
+			 *  then does the positive weight arcs' transitions.
+			 */
 			
-			Collections.shuffle(positiveWeightArcs);
-			Collections.sort(positiveWeightArcs);
-						
-			this.disableConflictingTransitions(place, positiveWeightArcs);
+			double markingsAfterFiring = this.disableConflictingTransitions(place,
+									place.getMarkings(), negativeWeightArcs);
+
+			this.disableConflictingTransitions(place, markingsAfterFiring,
+														positiveWeightArcs);
 		}
 	}
 	
@@ -274,8 +312,7 @@ public class PetriNet {
 			
 		for (Arc arcInList : this.arcList) {		
 			arcInList.setTransitionStatus();
-		}			
-		this.identifyAndSolveConflicts();
+		}					
 	}
 	
 	/**
@@ -311,7 +348,7 @@ public class PetriNet {
 			arcsMap.get(key).add(arcInList);
 		}		
 	}
-	
+		
 	/**
 	 * Fire transitions (by priority), testing for disabling in each new
 	 * transition.
@@ -319,6 +356,20 @@ public class PetriNet {
 	 * Conflicting situations should be solved naturally by doing it that way.
 	 */
 	private void fireNet(){
+		
+		if ( (Evolution.getIteration() == 0) && (Evolution.getTime() > 0) ) {
+			// TODO memory issue
+			this.timeIntegrate();
+			
+			// after integration, disable time transitions			
+			for (Transition transition : this.transitionList){
+						
+				if (transition instanceof ContinuousTimeTransition){
+					transition.setEnabledStatus(false);
+				}
+			}
+		}		
+		
 		for (Arc arc : this.arcList){
 									
 			// if enabled, fire
@@ -442,12 +493,29 @@ public class PetriNet {
 			this.mapArcs();
 		}		
 		
-		// also tests for conflicts
 		this.testDisablings();
+		
+		this.identifyAndSolveConflicts();
 		
 		this.generateLog();
 		
 		this.fireNet();
+	}
+	
+	/**
+	 * If time is greater than zero, and iteration = 0, call this method.
+	 * <p>
+	 * It creates the State Space model of the net and do an integration of one
+	 * time step, changing the markings of the places in the process.
+	 */
+	private void timeIntegrate() {
+		
+		StateSpace SS = new StateSpace(this.placeList, this.arcsMap);
+		
+		// will only consider enabled transitions.
+		SS.integrate(rk4);		
+		
+		this.timeUpdateElements();
 	}
 	
 	/**
@@ -495,20 +563,10 @@ public class PetriNet {
 	}
 	
 	/**
-	 * A map of the places' markings. To be used during runtime
-	 * to update objects.
-	 * <p>
-	 * If some arbitrary constant must be used in the net, create an
-	 * isolated place with the markings value you want to be the constant. 
-	 * <p>
-	 * (String) key = variable name
-	 * <p>
-	 * (Double) value = place markings.
-	 */
-	private Map <String, Double> markingsMap = new HashMap <String, Double>();
-	
-	/**
 	 * Populate map (updating if non-empty).
+	 * <br>
+	 * This gets called in each update (both time and iteration, which is
+	 * redundant, but whatever...).
 	 */
 	private void populateMarkingsMap(){
 		

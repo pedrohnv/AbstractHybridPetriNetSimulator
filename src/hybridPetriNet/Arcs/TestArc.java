@@ -80,6 +80,20 @@ public class TestArc extends Arc {
 		this.testThresholdString = testThreshold;
 	}
 	
+	/**
+	 * @param name
+	 * @param place
+	 * @param transition
+	 * @param testThreshold
+	 * @param variableName
+	 */
+	public TestArc(String name, Place place, Transition transition, 
+			String testThreshold, String variableName) {
+		super(name, place, transition, 0.0);
+		this.testThresholdString = testThreshold;
+		this.variableName = variableName;
+	}
+	
 	/** 
 	 * @param place
 	 * @param transition
@@ -158,5 +172,35 @@ public class TestArc extends Arc {
 	public void iterationUpdate() {
 		// evaluate the weight (if it is a function).
 		this.testThreshold = evaluator.evaluate(this.testThresholdString);
+	}
+	
+	/**
+	 * In a test arc, the get weight returns the test threshold (as if it was
+	 * the weight).
+	 */
+	@Override
+	public Double getWeight(){return this.testThreshold;}
+	
+	/**
+	 * In a test arc, the test threshold is treated as the weight.
+	 */
+	@Override
+	public String getWeightString(){return this.testThresholdString;}
+	
+	/**
+	 * In a test arc, the test threshold is treated as the weight.
+	 */
+	@Override
+	public void changeWeight(double w){
+		this.testThreshold = w;
+		this.testThresholdString = String.valueOf(w);
+	}
+	
+	/**
+	 * In a test arc, the test threshold is treated as the weight.
+	 */
+	@Override
+	public void changeWeightString(String w){
+		this.testThresholdString = w;
 	}
 }

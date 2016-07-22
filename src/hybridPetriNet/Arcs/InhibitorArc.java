@@ -94,6 +94,18 @@ public class InhibitorArc extends TestArc {
 		super(name, place, transition, testThreshold);
 	}
 	
+	/**
+	 * @param name
+	 * @param place
+	 * @param transition
+	 * @param testThreshold
+	 * @param variableName
+	 */
+	public InhibitorArc(String name, Place place, Transition transition,
+			String testThreshold, String variableName) {
+		super(name, place, transition, testThreshold, variableName);
+	}
+	
 	/** 
 	 * The inhibitor arc disabling function: tests if the markings in the
 	 * place are GREATER or equal than a threshold.

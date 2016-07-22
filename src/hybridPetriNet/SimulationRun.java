@@ -49,7 +49,7 @@ public abstract class SimulationRun {
 	private static String stringResults;
 	
 	private static String ResultsFileName;
-	
+		
 	/**
 	 * Define the name of the file (csv) that is created with the results saved.
 	 * @param name
@@ -242,12 +242,10 @@ public abstract class SimulationRun {
 			 *  Append the results from the simulation of the parent net into
 			 *  stringResults attribute.
 			 */
-			appendResults(parentNet);
-							
+			appendResults(parentNet);							
 		}
 	 }
-	 
-	
+	 	
 	/**
 	 * Simulate all nets. Enter any number of nets as argument.
 	 * @param nets
@@ -261,7 +259,7 @@ public abstract class SimulationRun {
 		// will run until the final time is reached
 		while(Evolution.getTime() <= Evolution.getFinalTime()) {
 			
-			parentNet.timeUpdateElements();
+			// a call to time update the net is done in it's timeIntegrate method
 			
 			if (parentNet.isDeadlocked() || parentNet.isLivelocked()){
 				// if deadlocked or livelocked, stop simulation
@@ -270,8 +268,7 @@ public abstract class SimulationRun {
 			
 			loopIterate(parentNet);
 			
-			Evolution.updateTime();
-			
+			Evolution.updateTime();			
 		}		
 		// save simulation results to csv file
 		generateCsvFile(stringResults);		

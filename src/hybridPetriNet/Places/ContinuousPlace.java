@@ -62,6 +62,14 @@ public class ContinuousPlace extends Place {
 		this.markings = markings;
 		this.changeCapacity(capacity); // call mutator
 	}
+	
+	public ContinuousPlace(String name, double markings, double[] capacity,
+														String variableName){
+		super(name);
+		this.markings = markings;
+		this.changeCapacity(capacity); // call mutator
+		this.changeVariableName(variableName);	
+	}
 		
 	/*
 	 * Object methods

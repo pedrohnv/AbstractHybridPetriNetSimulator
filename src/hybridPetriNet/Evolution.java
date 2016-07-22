@@ -41,9 +41,9 @@ public abstract class Evolution {
 	 * captured by the net. Smaller means more accuracy, but greater processing
 	 * time.
 	 * <p>
-	 * Some errors may appear for using a value too small. 
+	 * Some errors may appear for using a value too small.
 	 */
-	private static Double timeStep = 1e-10;
+	private static Double timeStep = 1e-5;
 	
 	/* TODO add dynamic time step. Make it be the smallest value to which a
  	 * change in the net occurs (a transition is enabled or disabled).

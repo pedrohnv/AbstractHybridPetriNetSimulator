@@ -50,6 +50,8 @@ import utilities.AdaptedEvaluator;
  * Place -> transition, weight < 0;
  * <p>
  * Transition -> place, weight > 0.
+ * <p>
+ * Variable name, the arc's weight, is hardcoded to be "w + arc.index".
  */
 public class Arc implements Comparable <Arc> {
 	
@@ -57,6 +59,7 @@ public class Arc implements Comparable <Arc> {
 	protected Double weight;
 	protected Place place;
 	protected Transition transition;
+	protected String variableName;
 
 	/**
 	 * Weight stored as a String. To be evaluated at each update.
@@ -82,7 +85,6 @@ public class Arc implements Comparable <Arc> {
 	 */
 	/**
 	 * place to transition
-	 * 
 	 * @param place
 	 * @param transition
 	 * @param weight = -1
@@ -93,11 +95,11 @@ public class Arc implements Comparable <Arc> {
 		this.index = counter.incrementAndGet();
 		this.weight = -1.0;
 		this.weightString = "-1.0";
+		this.variableName = "w" + String.valueOf(index);
 	}
 	
 	/**
 	 * transition to place
-	 * 
 	 * @param transition
 	 * @param place
 	 * @param weight = +1
@@ -108,6 +110,7 @@ public class Arc implements Comparable <Arc> {
 		this.index = counter.incrementAndGet();
 		this.weight = 1.0;
 		this.weightString = "1.0";
+		this.variableName = "w" + String.valueOf(index);
 	}
 	
 	/**
@@ -121,6 +124,7 @@ public class Arc implements Comparable <Arc> {
 		this.index = counter.incrementAndGet();
 		this.weight = weight;
 		this.weightString = weight.toString();
+		this.variableName = "w" + String.valueOf(index);
 	}
 	
 	/**
@@ -133,6 +137,7 @@ public class Arc implements Comparable <Arc> {
 		this.transition = transition;
 		this.index = counter.incrementAndGet();
 		this.weightString = weight;
+		this.variableName = "w" + String.valueOf(index);
 	}
 
 	/**
@@ -148,6 +153,7 @@ public class Arc implements Comparable <Arc> {
 		this.name = name;
 		this.weight = weight;
 		this.weightString = weight.toString();
+		this.variableName = "w" + String.valueOf(index);
 	}
 	
 	/**
@@ -162,8 +168,25 @@ public class Arc implements Comparable <Arc> {
 		this.index = counter.incrementAndGet();	
 		this.name = name;
 		this.weightString = weight;
+		this.variableName = "w" + String.valueOf(index);
 	}
 	
+	/**
+	 * @param name
+	 * @param place
+	 * @param transition
+	 * @param weight
+	 * @param variableName
+	 */
+	public Arc(String name, Place place, Transition transition, String weight,
+			String variableName) {
+		this.place = place;
+		this.transition = transition;
+		this.index = counter.incrementAndGet();	
+		this.name = name;
+		this.weightString = weight;
+		this.variableName = variableName;
+	}
 	
 	/*
 	 * accessors
@@ -180,13 +203,23 @@ public class Arc implements Comparable <Arc> {
 	
 	public Double getWeight() {return this.weight;}
 	
+	public String getWeightString() {return this.weightString;}
+	
+	public String getVariableName() {return this.variableName;}	
 	
 	/*
 	 * mutators
 	 */
 	public void changeName(String newName) {this.name = newName;}
 		
-	public void changeWeight(double newWeight) {this.weight = newWeight;}
+	public void changeWeight(double newWeight) {
+		this.weight = newWeight;
+		this.weightString = String.valueOf(newWeight);
+	}
+	
+	public void changeWeightString(String newWeight) {		
+		this.weightString = newWeight;
+	}
 	
 	public void changePlace(Place newPlace) {this.place = newPlace;}
 	
@@ -197,16 +230,7 @@ public class Arc implements Comparable <Arc> {
 	
 	/*
 	 * General methods
-	 */
-	/**
-	 * Check if arc already exists (an arc that connect the same place and
-	 * transition as another).
-	 */
-	@SuppressWarnings("unused")
-	private void checkExistance(){
-		//TODO
-	}
-	
+	 */	
 	/** 
 	 * The default disabling function tests if the markings of the place,
 	 * after the firing of the associated transition, will remain inside

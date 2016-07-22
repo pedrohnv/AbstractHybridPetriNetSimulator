@@ -25,6 +25,8 @@ package hybridPetriNet.Places;
 
 import java.util.concurrent.atomic.AtomicInteger;
 
+import utilities.Helper;
+
 /**
  * The default place is a discrete place.
  * <p>
@@ -53,6 +55,15 @@ public class Place implements Comparable<Place> {
 	 */
 	protected final Integer index;
 	
+	/**
+	 * This field should be unique to each object. Used to be more convenient
+	 * to refer to the markings as variables in equations.
+	 * <p>
+	 * Default is "p + index".
+	 */
+	protected String variableName;
+	//TODO ensure unique variableNames among objects.
+		
 	/* 
      * constructors
      */   
@@ -61,7 +72,7 @@ public class Place implements Comparable<Place> {
 	 * @param markings = 0
 	 * @param capacity = [0, +inf]
 	 */
-    public Place(String name){
+	public Place(String name){
     	this.index = counter.incrementAndGet();
     	this.name= name;
 		this.markings = 0;
@@ -95,6 +106,18 @@ public class Place implements Comparable<Place> {
 		this.variableName = "p" + index.toString();
 	}
 
+	/**
+	 * @param name
+	 * @param markings
+	 * @param capacity
+	 */
+	public Place(String name, int markings, double[] capacity, String variableName){
+		this.index = counter.incrementAndGet();
+    	this.name= name;
+		this.markings = markings;
+		this.changeCapacity(capacity); // call mutator
+		this.changeVariableName(variableName);	
+	}
 	
 	/*
 	 * accessors
@@ -108,8 +131,9 @@ public class Place implements Comparable<Place> {
 	public int getIndex() {return this.index;}
 	
 	public static AtomicInteger getCounter() {return counter;}
-
 	
+	public String getVariableName() {return this.variableName;}
+		
 	/*
 	 * class general methods
 	 */	
@@ -160,12 +184,31 @@ public class Place implements Comparable<Place> {
 		return valid;
 	}
 	
+	/**
+	 * Returns an index that indicates if given value is below, above, or
+	 * inside the capacity of the place, (-1, +1, 0 respectively).
+	 */
+	public int verifyFitting(double newValue) {
+		int pointer;
+		
+		if (newValue < this.getCapacity()[0]){
+			pointer = -1;
+		}
+		else if (newValue > this.getCapacity()[1]){
+			pointer = +1;
+		}
+		else {
+			pointer = 0;
+		}
+		return pointer;
+	}
+	
 	/*
 	 * mutators
-	 */	
+	 */
 	/** 
 	 * This method changes the new markings of a place; i.e., the values
-	 * it will have by the end of the simulation. This signature is based
+	 * it will have by the end of the iteration. This signature is based
 	 * on the firing of a transition.
 	 * <p>
 	 * It tests if the new value is valid. If not, throws an exception.
@@ -184,8 +227,7 @@ public class Place implements Comparable<Place> {
 	}
 	
 	/** 
-	 * This method changes the new markings of a place; i.e., the values
-	 * it will have by the end of the simulation.
+	 * This method changes sets the new markings of a place.
 	 * <p>
 	 * It tests if the new value is valid. If not, throws an exception.
 	 */
@@ -200,7 +242,18 @@ public class Place implements Comparable<Place> {
 		}
 	}
 			
-	public void changeName(String newName) {this.name = newName;}
+	public void changePlaceName(String newName) {this.name = newName;}
+	
+	public void changeVariableName(String newName) {
+		if (Helper.notNumber(variableName)){
+			this.variableName = newName;
+		}
+		else {			
+			this.variableName = "p" + index.toString();
+			System.out.println("Invalid variable name, changed to default: "
+					+ this.variableName);
+		}
+	}
 			
 	/**
 	 * Capacity must be an array of doubles with two elements.
@@ -211,13 +264,18 @@ public class Place implements Comparable<Place> {
 	 */
 	public void changeCapacity(double[] newCapacity) {
 	
-		if ((newCapacity.length == 2) && (newCapacity[1] > newCapacity[0]) ){
+		if ((newCapacity.length == 2) && (newCapacity[1] >= newCapacity[0]) ){
 			this.capacity = newCapacity;
-			}
-		
+		}		
 		// throw exception if not of length two, or min > max.
 		else {throw new UnsupportedOperationException(
 				"Invalid capacity, did not change.");}
+	}
+	
+
+	public void changeCapacity(double minimum, double maximum) {
+		double[] newCapacity = {minimum,maximum};
+		this.changeCapacity(newCapacity);	
 	}
 	
 	/**
@@ -244,24 +302,6 @@ public class Place implements Comparable<Place> {
 		
 		return ( this.getIndex() - other.getIndex() );
 	}
-	
-	/**
-	 * This field should be unique to each object. Used to be more convenient
-	 * to refer to the markings as variables in equations.
-	 * <p>
-	 * Default is "p + index".
-	 */
-	private String variableName;
-	//TODO ensure unique variableNames among objects.
-	
-	public void setVariableName(String name) {
-		this.variableName = name;
-	}
-	
-	public String getVariableName() {
-		return this.variableName;
-	}
-	
 
-	
+		
 }

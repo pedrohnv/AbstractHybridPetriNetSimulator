@@ -85,7 +85,7 @@ public class Transition implements Comparable <Transition> {
 	public Transition (String name) {
 		this.name = name;
 		this.index = counter.incrementAndGet();
-		this.priority = 1;
+		this.changePriority(1);
 		this.firingFunction = 1.0;
 		this.enabledStatus = true;
 		this.firingFunctionString = "1.0";
@@ -99,7 +99,7 @@ public class Transition implements Comparable <Transition> {
 	public Transition (String name, int priority) {
 		this.name = name;
 		this.index = counter.incrementAndGet();
-		this.priority = priority;
+		this.changePriority(priority);
 		this.firingFunction = 1.0;
 		this.enabledStatus = true;
 		this.firingFunctionString = "1.0";
@@ -113,7 +113,7 @@ public class Transition implements Comparable <Transition> {
 	public Transition (String name, Double firingFunction) {
 		this.name = name;
 		this.index = counter.incrementAndGet();
-		this.priority = 1;
+		this.changePriority(1);
 		this.firingFunction = firingFunction;
 		this.enabledStatus = true;
 		this.firingFunctionString = String.valueOf(firingFunction);
@@ -128,9 +128,22 @@ public class Transition implements Comparable <Transition> {
 		this.name = name;
 		this.index = counter.incrementAndGet();
 		this.firingFunction = firingFunction;
-		this.priority = priority;
+		this.changePriority(priority);
 		this.enabledStatus = true;
 		this.firingFunctionString = String.valueOf(firingFunction);
+	}
+	
+	/**
+	 * @param name
+	 * @param priority
+	 * @param firingFunctionString
+	 */
+	public Transition(String name, int priority, String firingFunctionString) {
+		this.name = name;
+		this.index = counter.incrementAndGet();
+		this.changePriority(priority);
+		this.enabledStatus = true;
+		this.firingFunctionString = firingFunctionString;
 	}
 	
 	/*
@@ -141,6 +154,8 @@ public class Transition implements Comparable <Transition> {
 	public String getName() {return this.name;}
 	
 	public double getFiringFunction() {return this.firingFunction;}
+	
+	public String getFiringFunctionString() {return this.firingFunctionString;}
 	
 	public int getPriority() {return this.priority;}
 	
@@ -163,15 +178,26 @@ public class Transition implements Comparable <Transition> {
 	public void changeName(String newName) {this.name = newName;}
 	
 	/**
-	 * If priority is a function, it is recommended to implement the logic in
-	 * the main program run.
-	 * <p>
-	 * The same for the firing Function...
+	 * The priority must be greater or equal to zero.
+	 * @param priority
+	 * @throws UnsupportedOperationException
 	 */
-	public void changePriority(int newPriority) {this.priority = newPriority;}
+	public void changePriority(int newPriority) {
+		if (newPriority >= 0){
+			this.priority = newPriority;
+		}
+		else {
+			throw new UnsupportedOperationException("Priority must be greater"
+					+ " or equal to zero.");
+		}
+	}
 	
-	public void changefiringFunction(double newFiringFunction) {
+	public void changeFiringFunction(double newFiringFunction) {
 		this.firingFunction = newFiringFunction;
+	}
+	
+	public void changeFiringFunctionString(String newFiringFunction) {
+		this.firingFunctionString = newFiringFunction;
 	}
 			
 	/*
@@ -221,7 +247,7 @@ public class Transition implements Comparable <Transition> {
 	public void iterationUpdate(){
 		// evaluate firing function
 		this.firingFunction = evaluator.evaluate(this.firingFunctionString);
-		}
+	}
 
 	/**
 	 * Change the markings in a place.

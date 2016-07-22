@@ -1,5 +1,5 @@
 /**
-The MIT License (MIT)
+he MIT License (MIT)
 
 Copyright (c) 2016 Pedro Henrique Nascimento Vieira
 
@@ -29,10 +29,6 @@ import hybridPetriNet.Places.Place;
  * The continuous time transition fires only in the FIRST ITERATION (when
  * times advances), i.e., the firing function is exclusively a function of
  * time (and not iteration).
- * <p>
- * Set the firing function of this transition as the desired output TIMES
- * the Step time. In other words, this transition will change markings
- * corresponding to its firing function in ONE time step.
  */
 public class ContinuousTimeTransition extends Transition {
 			
@@ -131,11 +127,11 @@ public class ContinuousTimeTransition extends Transition {
 	 * The continuous transition's firing does an integration based on it's
 	 * firing speed.
 	 * <p>
-	 * This method multiplies the firing function by the time step.
+	 * The firing is done via integration in the StateSpace class.
 	 */
 	@Override
 	public void fire(Place place, double weight) {
-		Double adjustedFiringFunction = this.firingFunction * Evolution.getTimeStep(); 
-		place.changeMarkings(adjustedFiringFunction, weight);
+		// the firing is done via integration in the state space class
+		// leave this method blank
 	}
 }

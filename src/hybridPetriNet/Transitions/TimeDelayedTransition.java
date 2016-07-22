@@ -32,8 +32,7 @@ import hybridPetriNet.Evolution;
  * <p>
  * After enabled for the delay time, it can fire at every ITERATION.
  * <p>
- * new attributes: delayed firing function (the value of the firing function
- * after the delay has passed), enabled time, delay.
+ * new attributes: enabled time, delay.
  * <p>
  * Though this transition can function as a normal one (setting the delay
  * to zero), it is highly discouraged because of the extra code that is
@@ -42,11 +41,6 @@ import hybridPetriNet.Evolution;
  */
 public class TimeDelayedTransition extends Transition {
 
-	/**
-	 * New value of firing function after delayed time has passed
-	 */
-	protected double delayedFiringFunction = 1;
-	
 	/**
 	 * How much time the transition is enabled
 	 */
@@ -65,79 +59,63 @@ public class TimeDelayedTransition extends Transition {
 	 * @param delay = 1
 	 */
 	public TimeDelayedTransition(String name) {
-		super(name);		
-		this.firingFunction = 0.0;
+		super(name);
 	}
 
 	/**
 	 * @param name
 	 * @param delay
 	 * @param priority = 1
-	 * @param firingFunction = 0
-	 * @param delayedFiringFunction = 1
+	 * @param firingFunction = 1
 	 */
 	public TimeDelayedTransition(String name, double delay) {
 		super(name);
-		this.delayedFiringFunction = this.firingFunction;
-		this.firingFunction = 0.0;
-		this.delay = delay;
+		this.changeDelay(delay);
 	}	
 	
 	/**
 	 * @param name
 	 * @param delay
-	 * @param delayedFiringFunction
-	 * @param priority = 1
-	 * @param firingFunction = 0
-	 */
-	public TimeDelayedTransition(String name, double delay, 
-				double delayedFiringFunction) {
-		super(name);
-		this.delayedFiringFunction = delayedFiringFunction;
-		this.firingFunction = 0.0;
-		this.delay = delay;
-	}
-	
-	/**
-	 * @param name
-	 * @param delay
-	 * @param delayedFiringFunction
-	 * @param priority
-	 * @param firingFunction = 0
-	 */
-	public TimeDelayedTransition(String name, double delay, 
-				Double delayedFiringFunction, int priority) {
-		super(name);
-		this.delayedFiringFunction = delayedFiringFunction;
-		this.firingFunction = 0.0;
-		this.delay = delay;
-		this.priority = priority;
-	}
-	
-	/**
-	 * Constructor for when a transition that fires as normal, then change the 
-	 * firing speed after a delayed time.
-	 * @param name
-	 * @param delay
-	 * @param delayedFiringFunction
-	 * @param priority
 	 * @param firingFunction
+	 * @param priority = 1
 	 */
 	public TimeDelayedTransition(String name, double delay, 
-				Double delayedFiringFunction, int priority,
-				Double firingFunction) {
+				double firingFunction) {
 		super(name);
-		this.delayedFiringFunction = delayedFiringFunction;
-		this.firingFunction = firingFunction;
-		this.delay = delay;
+		this.changeDelay(delay);
+		this.firingFunctionString = String.valueOf(firingFunction);
+	}
+		
+	/**
+	 * @param name
+	 * @param delay
+	 * @param firingFunction
+	 * @param priority
+	 */
+	public TimeDelayedTransition(String name, double delay, 
+				Double firingFunction, int priority) {
+		super(name);
+		this.changeDelay(delay);
 		this.priority = priority;
+		this.firingFunctionString = String.valueOf(firingFunction);
 	}
 	
+	/**
+	 * @param name
+	 * @param delay = 1
+	 * @param firingFunction
+	 * @param priority
+	 */
+	public TimeDelayedTransition(String name, String firingFunction, int priority) {
+		super(name);
+		this.delay = 1;
+		this.priority = priority;
+		this.firingFunctionString = firingFunction;
+	}
+		
 	/*
 	 * accessors
-	 */
-	public double getDelayedFiringFunction() {return this.delayedFiringFunction;}
-	
+	 */	
 	public double getEnabledTime() {return this.enabledTime;}
 	
 	public double getDelay() {return this.delay;}
@@ -145,48 +123,41 @@ public class TimeDelayedTransition extends Transition {
 	/*
 	 * mutators
 	 */
-	public void changeDelayedFiringFunction(double newValue) {
-		this.delayedFiringFunction = newValue;}
-	
 	public void changeEnabledTime(double newValue) {
 		this.enabledTime = newValue;}
 	
 	public void changeDelay(double newValue) {
-		this.delay = newValue;}
-
+		if (newValue > 0){
+			this.delay = newValue;
+		}
+		else {
+			throw new UnsupportedOperationException("delay must be greater than zero!");
+		}
+	}
+	
 	/**
 	 *  This method is used inside an arc method.
 	 */
 	@Override
 	public void setEnabledStatus(boolean status) {
 		
-		this.enabledStatus = status;
-		
+		if ((status) && (this.enabledTime >= this.delay)){		
+			this.enabledStatus = status;
+		}
 		// order to disable
-		if (! status) { 
-			this.firingFunction = 0.0;
+		else if (!status){			
 			this.enabledTime = 0.0;
-			}
-		// if set to disabled, zero the firing function and enabled time 
+			this.enabledStatus = status;
+		}
 		
+		// if set to disabled, zero the firing function and enabled time 		
 	}
 
-	/**
-	 * The update method is used to create a function that changes the
-	 * properties of the elements at each TIME ADVANCEMENT.
-	 */
 	@Override
 	public void timeUpdate(){
 		// evaluate firing function
 		this.firingFunction = evaluator.evaluate(this.firingFunctionString);
-				
-		if (this.enabledStatus) {
-		this.enabledTime += Evolution.getTimeStep();
-		}
 		
-		if (this.enabledTime >= this.delay) {
-			this.firingFunction = this.delayedFiringFunction;
-		} 
-		else {this.firingFunction = 0.0; }
-	}
+		this.enabledTime += Evolution.getTimeStep();
+	}	
 }
