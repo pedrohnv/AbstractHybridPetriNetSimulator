@@ -21,22 +21,23 @@ IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
  */
-package hybridPetriNet.PetriNets;
+package hybridPetriNet.petriNets;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import hybridPetriNet.Evolution;
-import hybridPetriNet.Arcs.Arc;
-import hybridPetriNet.Places.Place;
-import hybridPetriNet.Transitions.Transition;
+import hybridPetriNet.arcs.Arc;
+import hybridPetriNet.places.Place;
+import hybridPetriNet.transitions.ContinuousTimeTransition;
+import hybridPetriNet.transitions.TimeDelayedTransition;
+import hybridPetriNet.transitions.Transition;
 import utilities.AdaptedEvaluator;
 import utilities.LogText;
-import hybridPetriNet.Transitions.ContinuousTimeTransition;
-import hybridPetriNet.Transitions.TimeDelayedTransition;
 
 /** 
  * This class implements and defines the behavior of the hybrid Petri net.
@@ -64,23 +65,23 @@ public class PetriNet {
 	/**
 	 * Use fourth (true) or second (false) order Runge-Kutta.
 	 */
-	public Boolean rk4 = false;
+	private Boolean fourthOrderRungeKutta = false;
 	
 	/**
 	 * The places are the keys.
 	 * <p>
 	 * The values are a list of arcs that contains the place
 	 */
-	private Map <Place, ArrayList<Arc> > arcsMap;
+	private Map <Place, List<Arc> > arcsMap;
 		
     /*
      * Array List because of sorting and shuffling methods
      */
-	private ArrayList <Place> placeList = new ArrayList <Place>();
+	private List <Place> placeList = new ArrayList <Place>();
 	
-	private ArrayList <Transition> transitionList = new ArrayList <Transition>();
+	private List <Transition> transitionList = new ArrayList <Transition>();
 	
-	private ArrayList <Arc> arcList = new ArrayList <Arc>();
+	private List <Arc> arcList = new ArrayList <Arc>();
 	
 	/**
 	 * A map of the places' markings. To be used during runtime
@@ -115,9 +116,8 @@ public class PetriNet {
 	 * @param transitionList
 	 * @param arcList
 	 */
-	public PetriNet(String netName, ArrayList<Place> placeList, 
-		ArrayList<Transition> transitionList, 
-		ArrayList<Arc> arcList) {
+	public PetriNet(String netName, List<Place> placeList, 
+		List<Transition> transitionList, List<Arc> arcList) {
 		
 		this.name = netName;
 		this.index = counter.incrementAndGet();
@@ -133,9 +133,8 @@ public class PetriNet {
 	 * @param transitionList
 	 * @param arcList
 	 */
-	public PetriNet(ArrayList<Place> placeList, 
-		ArrayList<Transition> transitionList, 
-		ArrayList<Arc> arcList) {
+	public PetriNet(List<Place> placeList, List<Transition> transitionList, 
+										List<Arc> arcList) {
 		
 		this.index = counter.incrementAndGet();
 		this.placeList = placeList;
@@ -191,19 +190,19 @@ public class PetriNet {
 	/** 
 	 * @return array list of net places
 	 */
-	public ArrayList <Place> getPlaces() { return this.placeList; }
+	public List <Place> getPlaces() { return this.placeList; }
 	
 	/** 
 	 * @return array list of net transitions
 	 */
-	public ArrayList <Transition> getTransitions() {
+	public List <Transition> getTransitions() {
 		return this.transitionList;
 	}
 	
 	/** 
 	 * @return array list of net arcs
 	 */
-	public ArrayList <Arc> getArcs() { return this.arcList; }
+	public List <Arc> getArcs() { return this.arcList; }
 	
 	public boolean isDeadlocked(){return this.deadlocked;}
 	
@@ -320,7 +319,7 @@ public class PetriNet {
 	 */
 	private void mapArcs() {
 		
-		arcsMap = new HashMap < Place, ArrayList<Arc> >();
+		arcsMap = new HashMap < Place, List<Arc> >();
 				
 		// a key in the arcsMap
 		Place key;
@@ -342,9 +341,8 @@ public class PetriNet {
 		 *  the map.
 		 */		
 		for (Arc arcInList : this.arcList) {			
-			
 			key = arcInList.getPlace();
-
+			
 			arcsMap.get(key).add(arcInList);
 		}		
 	}
@@ -358,7 +356,6 @@ public class PetriNet {
 	private void fireNet(){
 		
 		if ( (Evolution.getIteration() == 0) && (Evolution.getTime() > 0) ) {
-			// TODO memory issue
 			this.timeIntegrate();
 			
 			// after integration, disable time transitions			
@@ -486,12 +483,9 @@ public class PetriNet {
 	 *   <p>- fire enabled transitions;
 	 */	
 	public void iterateNet() {
-		
 		this.enableAllTransitions();
-				
-		if (this.arcsMap == null){
-			this.mapArcs();
-		}		
+		
+		this.mapArcs();
 		
 		this.testDisablings();
 		
@@ -513,7 +507,7 @@ public class PetriNet {
 		StateSpace SS = new StateSpace(this.placeList, this.arcsMap);
 		
 		// will only consider enabled transitions.
-		SS.integrate(rk4);		
+		SS.integrate(fourthOrderRungeKutta);		
 		
 		this.timeUpdateElements();
 	}
@@ -582,6 +576,14 @@ public class PetriNet {
 			
 			this.markingsMap.put(key, place.getMarkings());
 		}
+	}
+
+	public Boolean getFourthOrderRungeKutta() {
+		return fourthOrderRungeKutta;
+	}
+
+	public void setFourthOrderRungeKutta(Boolean fourthOrderRungeKutta) {
+		this.fourthOrderRungeKutta = fourthOrderRungeKutta;
 	}
 	
 }

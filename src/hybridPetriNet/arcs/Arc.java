@@ -21,12 +21,12 @@ IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
  */
-package hybridPetriNet.Arcs;
+package hybridPetriNet.arcs;
 
 import java.util.concurrent.atomic.AtomicInteger;
 
-import hybridPetriNet.Places.Place;
-import hybridPetriNet.Transitions.Transition;
+import hybridPetriNet.places.Place;
+import hybridPetriNet.transitions.Transition;
 import utilities.AdaptedEvaluator;
 
 /** 
@@ -162,12 +162,12 @@ public class Arc implements Comparable <Arc> {
 	 * @param transition
 	 * @param weight
 	 */
-	public Arc(String name, Place place, Transition transition, String weight) {
+	public Arc(String name, Place place, Transition transition, String weightString) {
 		this.place = place;
 		this.transition = transition;
 		this.index = counter.incrementAndGet();	
 		this.name = name;
-		this.weightString = weight;
+		this.weightString = weightString;
 		this.variableName = "w" + String.valueOf(index);
 	}
 	
@@ -178,13 +178,13 @@ public class Arc implements Comparable <Arc> {
 	 * @param weight
 	 * @param variableName
 	 */
-	public Arc(String name, Place place, Transition transition, String weight,
+	public Arc(String name, Place place, Transition transition, String weightString,
 			String variableName) {
 		this.place = place;
 		this.transition = transition;
 		this.index = counter.incrementAndGet();	
 		this.name = name;
-		this.weightString = weight;
+		this.weightString = weightString;
 		this.variableName = variableName;
 	}
 	
@@ -217,8 +217,24 @@ public class Arc implements Comparable <Arc> {
 		this.weightString = String.valueOf(newWeight);
 	}
 	
-	public void changeWeightString(String newWeight) {		
+	/**
+	 * If told to do imediate change, evaluates the weight string.
+	 * @param newWeight
+	 * @param imediateChange
+	 */
+	public void changeWeightString(String newWeight, boolean imediateChange) {		
 		this.weightString = newWeight;
+		if (imediateChange){
+			this.weight = evaluator.evaluate(this.weightString);
+		}
+	}
+	
+	/** 
+	 * @param newWeight
+	 * @param false
+	 */
+	public void changeWeightString(String newWeight) {		
+		this.changeWeightString(newWeight, false);
 	}
 	
 	public void changePlace(Place newPlace) {this.place = newPlace;}

@@ -30,10 +30,10 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
-import hybridPetriNet.PetriNets.PetriNet;
-import hybridPetriNet.Places.Place;
-import hybridPetriNet.Arcs.Arc;
-import hybridPetriNet.Transitions.Transition;
+import hybridPetriNet.places.Place;
+import hybridPetriNet.transitions.Transition;
+import hybridPetriNet.arcs.Arc;
+import hybridPetriNet.petriNets.PetriNet;
 import utilities.LogText;
 
 /**
@@ -48,14 +48,19 @@ public abstract class SimulationRun {
 	 */
 	private static String stringResults;
 	
-	private static String ResultsFileName;
+	private static String resultsFileName;
+	
+	/**
+	 * Generate a csv file?
+	 */
+	private static Boolean generateCsv;
 		
 	/**
 	 * Define the name of the file (csv) that is created with the results saved.
 	 * @param name
 	 */
 	public static void setResultsFileName(String name) {
-		SimulationRun.ResultsFileName = name;
+		SimulationRun.resultsFileName = name;
 	}
 	
 	/**
@@ -79,7 +84,7 @@ public abstract class SimulationRun {
 		ArrayList <Transition> transitionList = new ArrayList <Transition>();		
 		ArrayList <Arc> arcList = new ArrayList <Arc>();
 		
-		String names = "untitled"; 
+		String name = "untitled"; 
 		
 		/*
 		 *  Possible problems with multithreading because arrayList
@@ -112,7 +117,7 @@ public abstract class SimulationRun {
 		// sort Place list by Place's index, to organize the results
 		Collections.sort(placeList);		
 		
-		return (new PetriNet(names , placeList, transitionList, arcList));
+		return (new PetriNet(name, placeList, transitionList, arcList));
 	}
 	
 	/**
@@ -151,29 +156,29 @@ public abstract class SimulationRun {
 		 *  use by multiple threads. If such synchronization is required then
 		 *  it is recommended that StringBuffer be used.
 		 */
-				
-		StringBuilder strBuilder = new StringBuilder(stringResults);
 		
-		for (Place Place : net.getPlaces()) {
-			 		 
-			strBuilder.append(Place.getName());
-			strBuilder.append(','); // separator character
-			 
-			strBuilder.append(Place.getIndex());
-			strBuilder.append(',');
-			 
-			strBuilder.append(Evolution.getTime());
-			strBuilder.append(',');
-			 
-			strBuilder.append(Evolution.getIteration());
-			strBuilder.append(',');
-			 
-			strBuilder.append(Place.getMarkings());
-			strBuilder.append('\n'); // new line character
-		}		 		 
-		stringResults = strBuilder.toString();
-		
-		
+		if (SimulationRun.generateCsv){
+			StringBuilder strBuilder = new StringBuilder(stringResults);
+			
+			for (Place Place : net.getPlaces()) {
+				 		 
+				strBuilder.append(Place.getName());
+				strBuilder.append(','); // separator character
+				 
+				strBuilder.append(Place.getIndex());
+				strBuilder.append(',');
+				 
+				strBuilder.append(Evolution.getTime());
+				strBuilder.append(',');
+				 
+				strBuilder.append(Evolution.getIteration());
+				strBuilder.append(',');
+				 
+				strBuilder.append(Place.getMarkings());
+				strBuilder.append('\n'); // new line character
+			}		 		 
+			stringResults = strBuilder.toString();
+		}
 	}
 	
 	/**
@@ -183,27 +188,29 @@ public abstract class SimulationRun {
 	 */
 	 private static void generateCsvFile(String csvString) {
 		 
-		 PrintWriter printWriter = null;
-		 
-		 try {
-			printWriter = new PrintWriter(new File(ResultsFileName + ".csv"));
-		 }
-		 catch (FileNotFoundException e) {
-			e.printStackTrace();
-		 }	
-		 
-		 printWriter.write(csvString);		 
-		 printWriter.close();
-		 
-		 LogText.appendMessage("csv file created: " + ResultsFileName);
+		 if (SimulationRun.generateCsv){
+			 PrintWriter printWriter = null;
+			 
+			 try {
+				printWriter = new PrintWriter(new File(resultsFileName + ".csv"));
+			 }
+			 catch (FileNotFoundException e) {
+				e.printStackTrace();
+			 }	
+			 
+			 printWriter.write(csvString);		 
+			 printWriter.close();
+			 
+			 LogText.appendMessage("csv file created: " + resultsFileName);
+		 }		 
 	 }
-	 
+	 	 
 	 /**
 	 * Iterate net until max iteration is reached.
 	 * <p>
 	 * set the iteration to zero and loop.
 	 */
-	 private static void loopIterate(PetriNet parentNet){
+	 private static void loopIterate(PetriNet parentNet, long pause){
 		    
 		Evolution.setIteration(0);
 			
@@ -235,7 +242,15 @@ public abstract class SimulationRun {
 					LogText.appendMessage("deadlocked");
 					break;
 				}
-			}			
+			}
+			
+			// pause simulation for a time
+			try {
+				Thread.sleep(pause);
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+			
 			Evolution.updateIteration();
 							
 			/*
@@ -245,13 +260,14 @@ public abstract class SimulationRun {
 			appendResults(parentNet);							
 		}
 	 }
-	 	
+		
 	/**
-	 * Simulate all nets. Enter any number of nets as argument.
+	 * Simulate net with pause time in milliseconds.
 	 * @param nets
+	 * @param pause time
 	 * @throws FileNotFoundException 
 	 */
-	private static void simulateNet(PetriNet parentNet) {
+	private static void simulateNet(PetriNet parentNet, long pause) {
 		
 		// append initial state
 		appendResults(parentNet);
@@ -266,7 +282,7 @@ public abstract class SimulationRun {
 				break;
 			}
 			
-			loopIterate(parentNet);
+			loopIterate(parentNet, pause);
 			
 			Evolution.updateTime();			
 		}		
@@ -275,9 +291,21 @@ public abstract class SimulationRun {
 	}
 	
 	/**
-	 * Run the program.
+	 * Run the program. Genetrate csv with no pause.
 	 */
-	public static void RunProgram(PetriNet ... nets) {			
+	public static void RunProgram(PetriNet ... nets) {
+		RunProgram(0, true, nets);
+	}
+	
+	/**
+	 * Run the program simulating all nets.
+	 * @param pause time in milliseconds
+	 * @param csv generate csv file
+	 * @param nets
+	 */
+	public static void RunProgram(long pause, boolean csv, PetriNet ... nets) {			
+		
+		SimulationRun.generateCsv = csv;
 		
 		LogText.appendMessage("simulation starting");
 		
@@ -286,9 +314,17 @@ public abstract class SimulationRun {
 		PetriNet parentNet = buildTotalNet(nets);
 
 		// call program run
-		SimulationRun.simulateNet(parentNet);
+		SimulationRun.simulateNet(parentNet, pause);
 		
 		LogText.appendMessage("simulation ended");
+	}
+	
+	public static void setGenerateCsv(boolean b){
+		generateCsv = b;
+	}
+	
+	public static String getResultsFileName(){
+		return resultsFileName;
 	}
 		
 }

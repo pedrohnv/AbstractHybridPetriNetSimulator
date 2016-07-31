@@ -21,11 +21,11 @@ IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
  */
-package hybridPetriNet.Transitions;
+package hybridPetriNet.transitions;
 
 import java.util.concurrent.atomic.AtomicInteger;
 
-import hybridPetriNet.Places.Place;
+import hybridPetriNet.places.Place;
 import utilities.AdaptedEvaluator;
 
 /**

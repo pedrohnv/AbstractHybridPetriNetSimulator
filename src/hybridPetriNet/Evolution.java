@@ -43,7 +43,7 @@ public abstract class Evolution {
 	 * <p>
 	 * Some errors may appear for using a value too small.
 	 */
-	private static Double timeStep = 1e-5;
+	private static Double timeStep = 1e-3;
 	
 	/* TODO add dynamic time step. Make it be the smallest value to which a
  	 * change in the net occurs (a transition is enabled or disabled).
@@ -52,7 +52,7 @@ public abstract class Evolution {
 	private static Integer iteration = 0;
 	
 	/** This is used to end the program, considering a net livelocked.*/
-	private static Integer maxIterations = (int) 1e6;
+	private static Integer maxIterations = Integer.MAX_VALUE;
 		
 	/*
 	 * accessors 
@@ -124,4 +124,14 @@ public abstract class Evolution {
 	public static void updateIteration(){
 		Evolution.iteration += 1;}
 		
+	/** Return one iteration*/
+	public static void reverseIteration(){
+		if (iteration == 0){
+			Evolution.time -= Evolution.timeStep;	
+			Evolution.iteration = Evolution.maxIterations - 1;
+		}
+		else {
+			Evolution.iteration -= 1;
+		}
+	}
 }
