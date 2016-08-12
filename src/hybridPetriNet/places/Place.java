@@ -25,7 +25,7 @@ package hybridPetriNet.places;
 
 import java.util.concurrent.atomic.AtomicInteger;
 
-import utilities.Helper;
+import enums.PlaceType;
 
 /**
  * The default place is a discrete place.
@@ -61,64 +61,51 @@ public class Place implements Comparable<Place> {
 	 * <p>
 	 * Default is "p + index".
 	 */
-	protected String variableName;
-	//TODO ensure unique variableNames among objects.
-		
+	private String variableName;
+	
+	/**
+	 * A identifier of the type of place; for file saving/opening.
+	 */
+	protected PlaceType type = PlaceType.DISCRETE;
+	
 	/* 
      * constructors
-     */   
-	/**
-	 * @param name
-	 * @param markings = 0
-	 * @param capacity = [0, +inf]
-	 */
-	public Place(String name){
-    	this.index = counter.incrementAndGet();
-    	this.name= name;
-		this.markings = 0;
-		this.capacity = new double[] {0.0, Double.POSITIVE_INFINITY};
-		this.variableName = "p" + index.toString();
-	}
-	
-    /**
-     * @param name
-     * @param markings
-     * @param capacity = [0, +inf]
      */
-	public Place(String name, int markings){
-		this.index = counter.incrementAndGet();
-    	this.name= name;
-		this.markings = markings;
-		this.capacity = new double[] {0.0, Double.POSITIVE_INFINITY};
-		this.variableName = "p" + index.toString();
-	}
-	
 	/**
-	 * @param name
-	 * @param markings
-	 * @param capacity
-	 */
-	public Place(String name, int markings, double[] capacity){
-		this.index = counter.incrementAndGet();
-    	this.name= name;
-		this.markings = markings;
-		this.changeCapacity(capacity); // call mutator
-		this.variableName = "p" + index.toString();
-	}
-
-	/**
+	 * The input markings is cast to an integer.
 	 * @param name
 	 * @param markings
 	 * @param capacity
 	 */
 	public Place(String name, int markings, double[] capacity, String variableName){
 		this.index = counter.incrementAndGet();
-    	this.name= name;
-		this.markings = markings;
-		this.changeCapacity(capacity); // call mutator
-		this.changeVariableName(variableName);	
+    	this.name = name;
+    	this.changeCapacity(capacity);
+    	this.changeMarkings(markings);		
+		this.changeVariableName(variableName);
 	}
 	
+	/**
+	 * @param name
+	 * @param markings = 0
+	 * @param capacity = [0, +inf]
+	 */
+	public Place(String name){
+		this(name, 0, new double[] {0.0, Double.POSITIVE_INFINITY}, defaultName());
+	}
+
+	/**
+	 * Generates a default VARIABLE name for the place.
+	 * @return p + index
+	 */
+	private static String defaultName(){
+		String variableName = "p" + counter.incrementAndGet();
+		// must decrement the counter because it will be further incremented
+		// when the index is set.
+		counter.decrementAndGet();
+		return variableName;
+	}
+
 	/*
 	 * accessors
 	 */
@@ -137,19 +124,6 @@ public class Place implements Comparable<Place> {
 	/*
 	 * class general methods
 	 */	
-	/**
-	 *  This method is to override the equals method of an object.
-	 *  It identifies each place by its index.
-	 */
-	public boolean equals(Place other) {		
-		
-		boolean equality = false;
-		
-	    if (this.index == other.index){ equality = true;}
-	    
-	    return equality;
-	}
-    
     /**
 	 *  This method returns the new values the markings of a place will
 	 *  have after the firing of a transition.
@@ -158,8 +132,7 @@ public class Place implements Comparable<Place> {
 	 *  used for testing.
 	 *  @return double
 	 */
-	public double newMarkingsValue(double firingFunction, double weight){		
-			
+	public double newMarkingsValue(double firingFunction, double weight){			
 		return (this.markings + weight*firingFunction);
 	}
     
@@ -170,18 +143,18 @@ public class Place implements Comparable<Place> {
 	 *  As this is a discrete place, the new markings must be an integer.
 	 */	
 	public boolean checkValidMarkings(double newValue){
-		boolean valid = false;
 		
-		if ( (newValue % 1) == 0 &&
-		(newValue >= this.getCapacity()[0]) && 
-		(newValue <= this.getCapacity()[1]) ){
+		if ( (newValue % 1) == 0 && (newValue >= this.getCapacity()[0]) && 
+				(newValue <= this.getCapacity()[1]) ){
 			/*
 			 *  if newValue is integer, (newValue % 1) = 0, i.e., the rest 
 			 *  of the integer division will be zero.
 			 */			
-			valid = true;		
+			return true;		
 		}
-		return valid;
+		else {
+			return false;
+		}
 	}
 	
 	/**
@@ -234,7 +207,7 @@ public class Place implements Comparable<Place> {
 	public void changeMarkings(double newValue){		
 										
 		if (checkValidMarkings(newValue)){
-			this.markings = newValue;
+			this.markings = (int) newValue;
 		}
 		else {
 			throw new UnsupportedOperationException(
@@ -244,17 +217,10 @@ public class Place implements Comparable<Place> {
 			
 	public void changePlaceName(String newName) {this.name = newName;}
 	
-	public void changeVariableName(String newName) {
-		if (Helper.notNumber(variableName)){
-			this.variableName = newName;
-		}
-		else {			
-			this.variableName = "p" + index.toString();
-			System.out.println("Invalid variable name, changed to default: "
-					+ this.variableName);
-		}
+	public void changeVariableName(String newName){
+		this.variableName = newName;
 	}
-			
+
 	/**
 	 * Capacity must be an array of doubles with two elements.
 	 * @param newCapacity = [min, max]
@@ -291,6 +257,19 @@ public class Place implements Comparable<Place> {
 	public void iterationUpdate() {}
 	
 	/**
+	 *  This method is to override the equals method of an object.
+	 *  It identifies each place by its index.
+	 */
+	public boolean equals(Object other) {		
+		if (other instanceof Place){
+			return (this.index == ((Place) other).index);
+		}
+		else {
+			return false;
+		}
+	}
+    	
+	/**
 	 * To organize results in the simulation
 	 * @param other
 	 * @return
@@ -302,6 +281,16 @@ public class Place implements Comparable<Place> {
 		
 		return ( this.getIndex() - other.getIndex() );
 	}
-
-		
+	
+	@Override
+	public String toString(){
+		String information = type.getLabel() + ";";
+		information += name + ";";
+		information += index + ";";
+		information += variableName + ";";
+		information += markings + ";";
+		information += capacity[0] + ";" + capacity[1] + ";";
+		return information;
+	}
+	
 }

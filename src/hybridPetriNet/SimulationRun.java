@@ -202,7 +202,7 @@ public abstract class SimulationRun {
 			 printWriter.close();
 			 
 			 LogText.appendMessage("csv file created: " + resultsFileName);
-		 }		 
+		 }
 	 }
 	 	 
 	 /**
@@ -249,8 +249,7 @@ public abstract class SimulationRun {
 				Thread.sleep(pause);
 			} catch (InterruptedException e) {
 				e.printStackTrace();
-			}
-			
+			}			
 			Evolution.updateIteration();
 							
 			/*
@@ -277,8 +276,8 @@ public abstract class SimulationRun {
 			
 			// a call to time update the net is done in it's timeIntegrate method
 			
-			if (parentNet.isDeadlocked() || parentNet.isLivelocked()){
-				// if deadlocked or livelocked, stop simulation
+			if (parentNet.isDeadlocked()){
+				// if deadlocked, stop simulation
 				break;
 			}
 			

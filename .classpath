@@ -5,6 +5,7 @@
 	<classpathentry kind="lib" path="C:/eclipse/workplace/Javaluator-v3.0.1/javaluator-3.0.1.jar" sourcepath="C:/eclipse/workplace/Javaluator-v3.0.1/javaluator-3.0.1-sources.jar"/>
 	<classpathentry kind="lib" path="C:/eclipse/workplace/Javaluator-v3.0.1/javaluator-3.0.1-javadoc.jar"/>
 	<classpathentry kind="lib" path="C:/eclipse/workplace/Javaluator-v3.0.1/javaluator-3.0.1-sources.jar"/>
-	<classpathentry kind="lib" path="/tutorials/miglayout15-swing.jar" sourcepath="/tutorials/miglayout-src.zip"/>
+	<classpathentry kind="lib" path="C:/eclipse/workplace/AbstractHybridPetriNetSimulator/miglayout15-swing.jar"/>
+	<classpathentry kind="lib" path="C:/eclipse/workplace/opencsv-3.8.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

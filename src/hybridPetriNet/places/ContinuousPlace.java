@@ -23,54 +23,40 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 package hybridPetriNet.places;
 
+import enums.PlaceType;
+
 /**
  * This is a continuous place. Markings may be any real number.
  */
-public class ContinuousPlace extends Place {	
+public class ContinuousPlace extends Place {
 		
 	/*
 	 * Constructors
 	 */
 	/**
 	 * @param name
-	 * @param markings = 0
-	 * @param capacity = [-inf, +inf]
-	 */
-	public ContinuousPlace(String name) {
-		super(name);
-		this.capacity = new double[] {Double.NEGATIVE_INFINITY, Double.POSITIVE_INFINITY};
-	}
-
-	/**
-	 * @param name
-	 * @param markings
-	 * @param capacity = [-inf, +inf]
-	 */
-	public ContinuousPlace(String name, double markings) {
-		super(name);
-		this.markings = markings; // did not call super because it enforces int value to markings.
-		this.capacity = new double[] {Double.NEGATIVE_INFINITY, Double.POSITIVE_INFINITY};
-	}
-
-	/**
-	 * @param name
 	 * @param markings
 	 * @param capacity
+	 * @param variableName
 	 */
-	public ContinuousPlace(String name, double markings, double[] capacity) {
-		super(name);
-		this.markings = markings;
-		this.changeCapacity(capacity); // call mutator
-	}
-	
 	public ContinuousPlace(String name, double markings, double[] capacity,
-														String variableName){
-		super(name);
-		this.markings = markings;
-		this.changeCapacity(capacity); // call mutator
-		this.changeVariableName(variableName);	
+			String variableName){
+		super(name, 0, capacity, variableName);
+		this.changeMarkings(markings);
+		this.type = PlaceType.CONTINUOUS;
 	}
-		
+
+	/**
+	 * @param name
+	 * @param markings = 0
+	 * @param capacity = [-inf, +inf]
+	 * @param variableName = "p"
+	 */
+	public ContinuousPlace(String name) {
+		this(name, 0, new double[] {Double.NEGATIVE_INFINITY, 
+				Double.POSITIVE_INFINITY}, "p");		
+	}
+
 	/*
 	 * Object methods
 	 */
@@ -80,13 +66,12 @@ public class ContinuousPlace extends Place {
 	 */
 	public boolean checkValidMarkings(double newValue){
 		
-		boolean valid = true;
-		
 		if ( (newValue < capacity[0]) || (newValue > capacity[1]) ) {
-			valid = false;
+			return false;
 		}
-		
-		return valid;
+		else {
+			return true;
+		}		
 	}
 	
 }

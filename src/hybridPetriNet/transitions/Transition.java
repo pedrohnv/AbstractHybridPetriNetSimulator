@@ -25,6 +25,7 @@ package hybridPetriNet.transitions;
 
 import java.util.concurrent.atomic.AtomicInteger;
 
+import enums.TransitionType;
 import hybridPetriNet.places.Place;
 import utilities.AdaptedEvaluator;
 
@@ -60,6 +61,11 @@ public class Transition implements Comparable <Transition> {
 	 *  index.
 	 */
 	protected final Integer index;
+	
+	/**
+	 * A identifier of the type of transition; for file saving/opening.
+	 */
+	protected TransitionType type = TransitionType.DISCRETE;
     
 	/**
 	 * This variable stores the firing function as a string, if it is not a
@@ -79,62 +85,6 @@ public class Transition implements Comparable <Transition> {
 	 */
 	/**
 	 * @param name
-	 * @param priority = 1
-	 * @param firingFunction = 1
-	 */
-	public Transition (String name) {
-		this.name = name;
-		this.index = counter.incrementAndGet();
-		this.changePriority(1);
-		this.firingFunction = 1.0;
-		this.enabledStatus = true;
-		this.firingFunctionString = "1.0";
-	}
-	
-	/**
-	 * @param name
-	 * @param priority
-	 * @param firingFunction = 1
-	 */
-	public Transition (String name, int priority) {
-		this.name = name;
-		this.index = counter.incrementAndGet();
-		this.changePriority(priority);
-		this.firingFunction = 1.0;
-		this.enabledStatus = true;
-		this.firingFunctionString = "1.0";
-	}
-	
-	/**
-	 * @param name
-	 * @param firingFunction
-	 * @param priority = 1
-	 */
-	public Transition (String name, Double firingFunction) {
-		this.name = name;
-		this.index = counter.incrementAndGet();
-		this.changePriority(1);
-		this.firingFunction = firingFunction;
-		this.enabledStatus = true;
-		this.firingFunctionString = String.valueOf(firingFunction);
-	}
-	
-	/**
-	 * @param name
-	 * @param priority
-	 * @param firingFunction
-	 */
-	public Transition (String name, int priority, Double firingFunction) {
-		this.name = name;
-		this.index = counter.incrementAndGet();
-		this.firingFunction = firingFunction;
-		this.changePriority(priority);
-		this.enabledStatus = true;
-		this.firingFunctionString = String.valueOf(firingFunction);
-	}
-	
-	/**
-	 * @param name
 	 * @param priority
 	 * @param firingFunctionString
 	 */
@@ -146,6 +96,15 @@ public class Transition implements Comparable <Transition> {
 		this.firingFunctionString = firingFunctionString;
 	}
 	
+	/**
+	 * @param name
+	 * @param priority = 1
+	 * @param firingFunction = 1
+	 */
+	public Transition (String name) {
+		this(name, 1, "1.0");
+	}	
+		
 	/*
 	 * accessors
 	 */
@@ -178,17 +137,16 @@ public class Transition implements Comparable <Transition> {
 	public void changeName(String newName) {this.name = newName;}
 	
 	/**
-	 * The priority must be greater or equal to zero.
+	 * The priority must be greater or equal to zero. If input is lower than
+	 * zero, priority is set to zero.
 	 * @param priority
-	 * @throws UnsupportedOperationException
 	 */
 	public void changePriority(int newPriority) {
 		if (newPriority >= 0){
 			this.priority = newPriority;
 		}
 		else {
-			throw new UnsupportedOperationException("Priority must be greater"
-					+ " or equal to zero.");
+			this.priority = 0;
 		}
 	}
 	
@@ -206,13 +164,15 @@ public class Transition implements Comparable <Transition> {
 	/**
 	 *  This method is to override the equals method of an object. It
 	 *  identifies each transition by its index.
-	 */
-	public boolean equals(Transition other) {
-		boolean equality = false;
-		
-	    if (this.index == other.index) equality = true;
-	    
-	    return equality;
+	 */	
+	@Override
+	public boolean equals(Object other){
+		if (other instanceof Transition){
+			return (this.index == ((Place) other).getIndex());
+		}
+		else {
+			return false;
+		}
 	}
 	
 	/**
@@ -256,6 +216,16 @@ public class Transition implements Comparable <Transition> {
 	 */
 	public void fire(Place place, double weight) {
 
-		place.changeMarkings(this.firingFunction,weight);
+		place.changeMarkings(this.firingFunction, weight);
+	}
+	
+	@Override
+	public String toString(){
+		String info = type.getLabel() + ";";
+		info += name + ";";
+		info += index + ";";
+		info += firingFunctionString + ";";
+		info += priority + ";";
+		return info;
 	}
 }

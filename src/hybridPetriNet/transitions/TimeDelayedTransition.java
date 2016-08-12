@@ -23,6 +23,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 package hybridPetriNet.transitions;
 
+import enums.TransitionType;
 import hybridPetriNet.Evolution;
 
 /**
@@ -53,66 +54,38 @@ public class TimeDelayedTransition extends Transition {
 	
 	/**
 	 * @param name
+	 * @param delay = 1
+	 * @param firingFunction
+	 * @param priority
+	 */
+	public TimeDelayedTransition(String name, int priority, String firingFunction,
+			double delay) {
+		super(name, priority, firingFunction);
+		this.delay = delay;
+		this.type = TransitionType.TIME_DELAYED;
+	}
+
+	/**
+	 * @param name
+	 * @param delay = 1
+	 * @param firingFunction
+	 * @param priority
+	 */
+	public TimeDelayedTransition(String name, int priority, String firingFunction) {
+		this(name, priority, firingFunction, 1.0);
+	}
+
+	/**
+	 * @param name
 	 * @param priority = 1
 	 * @param firingFunction = 0
 	 * @param delayedFiringFunction = 1
 	 * @param delay = 1
 	 */
 	public TimeDelayedTransition(String name) {
-		super(name);
-	}
-
-	/**
-	 * @param name
-	 * @param delay
-	 * @param priority = 1
-	 * @param firingFunction = 1
-	 */
-	public TimeDelayedTransition(String name, double delay) {
-		super(name);
-		this.changeDelay(delay);
-	}	
-	
-	/**
-	 * @param name
-	 * @param delay
-	 * @param firingFunction
-	 * @param priority = 1
-	 */
-	public TimeDelayedTransition(String name, double delay, 
-				double firingFunction) {
-		super(name);
-		this.changeDelay(delay);
-		this.firingFunctionString = String.valueOf(firingFunction);
-	}
-		
-	/**
-	 * @param name
-	 * @param delay
-	 * @param firingFunction
-	 * @param priority
-	 */
-	public TimeDelayedTransition(String name, double delay, 
-				Double firingFunction, int priority) {
-		super(name);
-		this.changeDelay(delay);
-		this.priority = priority;
-		this.firingFunctionString = String.valueOf(firingFunction);
+		this(name, 1, "1.0", 1.0);
 	}
 	
-	/**
-	 * @param name
-	 * @param delay = 1
-	 * @param firingFunction
-	 * @param priority
-	 */
-	public TimeDelayedTransition(String name, String firingFunction, int priority) {
-		super(name);
-		this.delay = 1;
-		this.priority = priority;
-		this.firingFunctionString = firingFunction;
-	}
-		
 	/*
 	 * accessors
 	 */	
@@ -159,5 +132,12 @@ public class TimeDelayedTransition extends Transition {
 		this.firingFunction = evaluator.evaluate(this.firingFunctionString);
 		
 		this.enabledTime += Evolution.getTimeStep();
-	}	
+	}
+	
+	@Override
+	public String toString(){
+		String info = super.toString();
+		info += delay + ";";
+		return info;
+	}
 }

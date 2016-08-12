@@ -25,6 +25,7 @@ package hybridPetriNet.arcs;
 
 import java.util.concurrent.atomic.AtomicInteger;
 
+import enums.ArcType;
 import hybridPetriNet.places.Place;
 import hybridPetriNet.transitions.Transition;
 import utilities.AdaptedEvaluator;
@@ -55,11 +56,9 @@ import utilities.AdaptedEvaluator;
  */
 public class Arc implements Comparable <Arc> {
 	
-	protected String name;
 	protected Double weight;
 	protected Place place;
 	protected Transition transition;
-	protected String variableName;
 
 	/**
 	 * Weight stored as a String. To be evaluated at each update.
@@ -80,53 +79,14 @@ public class Arc implements Comparable <Arc> {
 	 */
 	protected Integer index;
 	
+	/**
+	 * A identifier of the type of arc; for file saving/opening.
+	 */
+	protected ArcType type = ArcType.NORMAL;
+	
     /*
 	 * constructors
-	 */
-	/**
-	 * place to transition
-	 * @param place
-	 * @param transition
-	 * @param weight = -1
-	 */
-	public Arc(Place place, Transition transition) {
-		this.place = place;
-		this.transition = transition;
-		this.index = counter.incrementAndGet();
-		this.weight = -1.0;
-		this.weightString = "-1.0";
-		this.variableName = "w" + String.valueOf(index);
-	}
-	
-	/**
-	 * transition to place
-	 * @param transition
-	 * @param place
-	 * @param weight = +1
-	 */
-	public Arc(Transition transition, Place place) {
-		this.place = place;
-		this.transition = transition;
-		this.index = counter.incrementAndGet();
-		this.weight = 1.0;
-		this.weightString = "1.0";
-		this.variableName = "w" + String.valueOf(index);
-	}
-	
-	/**
-	 * @param place
-	 * @param transition
-	 * @param weight
-	 */
-	public Arc(Place place, Transition transition, Double weight) {
-		this.place = place;
-		this.transition = transition;
-		this.index = counter.incrementAndGet();
-		this.weight = weight;
-		this.weightString = weight.toString();
-		this.variableName = "w" + String.valueOf(index);
-	}
-	
+	 */	
 	/**
 	 * @param place
 	 * @param transition
@@ -136,65 +96,34 @@ public class Arc implements Comparable <Arc> {
 		this.place = place;
 		this.transition = transition;
 		this.index = counter.incrementAndGet();
-		this.weightString = weight;
-		this.variableName = "w" + String.valueOf(index);
-	}
-
-	/**
-	 * @param name
-	 * @param place
-	 * @param transition
-	 * @param weight
-	 */
-	public Arc(String name, Place place, Transition transition, Double weight) {
-		this.place = place;
-		this.transition = transition;
-		this.index = counter.incrementAndGet();	
-		this.name = name;
-		this.weight = weight;
-		this.weightString = weight.toString();
-		this.variableName = "w" + String.valueOf(index);
+		this.changeWeightString(weight);
 	}
 	
 	/**
-	 * @param name
+	 * place to transition
 	 * @param place
 	 * @param transition
-	 * @param weight
+	 * @param weight = -1
 	 */
-	public Arc(String name, Place place, Transition transition, String weightString) {
-		this.place = place;
-		this.transition = transition;
-		this.index = counter.incrementAndGet();	
-		this.name = name;
-		this.weightString = weightString;
-		this.variableName = "w" + String.valueOf(index);
+	public Arc(Place place, Transition transition) {
+		this(place, transition, "-1.0");
 	}
 	
 	/**
-	 * @param name
-	 * @param place
+	 * transition to place
 	 * @param transition
-	 * @param weight
-	 * @param variableName
+	 * @param place
+	 * @param weight = +1
 	 */
-	public Arc(String name, Place place, Transition transition, String weightString,
-			String variableName) {
-		this.place = place;
-		this.transition = transition;
-		this.index = counter.incrementAndGet();	
-		this.name = name;
-		this.weightString = weightString;
-		this.variableName = variableName;
+	public Arc(Transition transition, Place place) {
+		this(place, transition, "1.0");
 	}
 	
 	/*
 	 * accessors
 	 */
 	public static AtomicInteger getCounter() {return counter;}
-	
-	public String getName() {return this.name;}
-	
+		
 	public Place getPlace() {return this.place;}
 	
 	public Transition getTransition() {return this.transition;}
@@ -205,36 +134,23 @@ public class Arc implements Comparable <Arc> {
 	
 	public String getWeightString() {return this.weightString;}
 	
-	public String getVariableName() {return this.variableName;}	
-	
 	/*
 	 * mutators
-	 */
-	public void changeName(String newName) {this.name = newName;}
-		
+	 */		
 	public void changeWeight(double newWeight) {
 		this.weight = newWeight;
 		this.weightString = String.valueOf(newWeight);
 	}
 	
 	/**
-	 * If told to do imediate change, evaluates the weight string.
+	 * Changes the weight string and immediately evaluates.
 	 * @param newWeight
 	 * @param imediateChange
 	 */
-	public void changeWeightString(String newWeight, boolean imediateChange) {		
-		this.weightString = newWeight;
-		if (imediateChange){
-			this.weight = evaluator.evaluate(this.weightString);
-		}
-	}
-	
-	/** 
-	 * @param newWeight
-	 * @param false
-	 */
 	public void changeWeightString(String newWeight) {		
-		this.changeWeightString(newWeight, false);
+		this.weightString = newWeight;
+		
+		this.weight = evaluator.evaluate(this.weightString);		
 	}
 	
 	public void changePlace(Place newPlace) {this.place = newPlace;}
@@ -242,7 +158,6 @@ public class Arc implements Comparable <Arc> {
 	public void changeTransition(Transition newTransition) {
 		this.transition = newTransition;
 	}
-	
 	
 	/*
 	 * General methods
@@ -314,12 +229,12 @@ public class Arc implements Comparable <Arc> {
 	 *  identifies each arc by its index.
 	 */
 	public boolean equals(Arc other) {
-		
-		boolean equality = false;
-		
-	    if (this.index == other.index) equality = true;
-	    
-	    return equality;
+		if (other instanceof Arc){
+			return (this.index == ((Arc) other).index);
+		}
+		else {
+			return false;
+		}
 	}
 		
 	/**
@@ -354,6 +269,13 @@ public class Arc implements Comparable <Arc> {
 	public void iterationUpdate() {
 		// evaluate the weight (if it is a function).
 		this.weight = evaluator.evaluate(this.weightString);
+	}
+	
+	@Override
+	public String toString() {
+		String info = type.getLabel() + ";";
+		info += weightString + ";";
+		return info;
 	}
 	
 }

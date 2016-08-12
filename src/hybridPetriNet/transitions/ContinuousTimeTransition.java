@@ -22,6 +22,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 package hybridPetriNet.transitions;
 
+import enums.TransitionType;
 import hybridPetriNet.Evolution;
 import hybridPetriNet.places.Place;
 
@@ -31,7 +32,19 @@ import hybridPetriNet.places.Place;
  * time (and not iteration).
  */
 public class ContinuousTimeTransition extends Transition {
-			
+		
+	/**
+	 * The inputed firing function is multiplied by the time step.
+	 * @param name
+	 * @param firingFunction
+	 * @param priority
+	 */
+	public ContinuousTimeTransition(String name, int priority,
+										String firingFunctionExpression){
+		super(name, priority, firingFunctionExpression);
+		this.type = TransitionType.CONTINUOUS;
+	}
+	
 	/**
 	 * The inputed firing function is multiplied by the time step during the
 	 * simulation.
@@ -40,73 +53,9 @@ public class ContinuousTimeTransition extends Transition {
 	 * @param firingFunction = 1
 	 */
 	public ContinuousTimeTransition(String name) {
-		super(name);
-	}
-
-	/**
-	 * The inputed firing function is multiplied by the time step during the
-	 * simulation.
-	 * @param name
-	 * @param priority
-	 * @param firingFunction = 1
-	 */
-	public ContinuousTimeTransition(String name, int priority) {
-		super(name, priority);
-	}
-
-	/**
-	 * The inputed firing function is multiplied by the time step during the
-	 * simulation.
-	 * @param name
-	 * @param priority
-	 * @param firingFunction
-	 */
-	public ContinuousTimeTransition(String name, int priority, double firingFunction) {
-		super(name, priority, firingFunction);
+		this(name, 1, "1.0");		
 	}
 	
-	/**
-	 * The inputed firing function is multiplied by the time step during the
-	 * simulation.
-	 * @param name
-	 * @param firingFunction
-	 * @param priority = 1
-	 */
-	public ContinuousTimeTransition(String name, double firingFunction){
-		super(name, firingFunction);
-		this.firingFunctionString = String.valueOf( firingFunction );
-	}
-	
-	/**
-	 * The inputed firing function is multiplied by the time step during the
-	 * simulation.
-	 * @param name
-	 * @param firingFunction
-	 * @param priority = 1
-	 */
-	public ContinuousTimeTransition(String name, String firingFunctionExpression){
-		super(name);
-		// firing function is initially (default) set to 1. Before the first
-		// iteration it should be updated to it's true value.
-		this.firingFunctionString = firingFunctionExpression;
-	}
-	
-	/**
-	 * The inputed firing function is multiplied by the time step.
-	 * @param name
-	 * @param firingFunction
-	 * @param priority
-	 */
-	public ContinuousTimeTransition(String name, String firingFunctionExpression,
-								int priority){
-		super(name);
-		// firing function is initially (default) set to 1. Before the first
-		// iteration it should be updated to it's true value.
-				
-		this.firingFunctionString = firingFunctionExpression;
-		this.priority = priority;
-	}
-		
 	/**
 	 *  This method is used inside an arc method.
 	 *  <br>
