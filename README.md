@@ -10,15 +10,9 @@ To ensure this, try to fit -Petri net type- in the same definition of hybrid Pet
 ## Software Status
 Hopefully, the code is commented enough to be easily understood.
 
-There is no GUI yet. The simulation must be run brute-code. The example should be enough to permit you to run the program and adapt it to your needs.
-
-I thought of using the GUI from [PIPE.](https://github.com/sarahtattersall/PIPE#pipe-5-)
-
 In future versions a PNML framework will be implemented. This will allow export/import of Petri nets to/from other software.
 
 A default support for colored Petri nets was not done yet. A recommendation is to duplicate (or tri, or whatever number of colors you have), make the necessary changes; so each net represents a color.
-
-The code does not support multiple threading. I am not sure there would any real, or truly necessary, performance gain by doing so.
 
 ### TODO
 - improve GUI, add animations;
