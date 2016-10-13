@@ -7,6 +7,8 @@ To ensure this, try to fit -Petri net type- in the same definition of hybrid Pet
 
 ## Author's definition of hybrid Petri net
 
+\more on this later...
+
 ## Software Status
 Hopefully, the code is commented enough to be easily understood.
 
