@@ -49,10 +49,6 @@ public class Place implements Comparable<Place> {
 	// atomic integer because of multithreading
 	private static AtomicInteger counter = new AtomicInteger(0);
 			
-	/*
-	 *  All objects extending the Abstract super class should have a unique
-	 *  index.
-	 */
 	protected final Integer index;
 	
 	/**
@@ -261,12 +257,13 @@ public class Place implements Comparable<Place> {
 	 *  It identifies each place by its index.
 	 */
 	public boolean equals(Object other) {		
-		if (other instanceof Place){
-			return (this.index == ((Place) other).index);
-		}
-		else {
-			return false;
-		}
+		return ((other instanceof Place) &&
+				(this.index.equals( ((Place) other).index)) );
+	}
+	
+	@Override
+	public int hashCode() {
+	    return index == null ? 0 : index;
 	}
     	
 	/**
@@ -275,10 +272,6 @@ public class Place implements Comparable<Place> {
 	 * @return
 	 */
 	public int compareTo(Place other) {
-		
-		if ((other == null) || (this == null))
-			throw new NullPointerException("a place is null");
-		
 		return ( this.getIndex() - other.getIndex() );
 	}
 	

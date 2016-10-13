@@ -1,0 +1,20 @@
+## Utility classes
+
+This package harbors helper classes.
+
+### AdaptedEvaluator
+
+An adapted class that extends the DoubleEvaluator from Javaluator
+(http://javaluator.soft.fathzer.com) library.
+
+It implicitly declares the variables by searching for them in the markingsMap
+of the PetriNet (object).
+
+The functions sqrt and sign are also added.
+
+Javaluator is freely distributed under LGPLv3 license
+(https://opensource.org/licenses/lgpl-3.0.html).
+
+### LogText
+
+A class to store the log generate during the simulation for latter printing.

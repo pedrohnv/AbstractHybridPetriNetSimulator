@@ -73,10 +73,6 @@ public class Arc implements Comparable <Arc> {
 	// atomic integer because of multithreading
 	private static AtomicInteger counter = new AtomicInteger(0);
 
-	/*
-	 *  All objects extending the  super class should have a unique
-	 *  index.
-	 */
 	protected Integer index;
 	
 	/**
@@ -150,7 +146,12 @@ public class Arc implements Comparable <Arc> {
 	public void changeWeightString(String newWeight) {		
 		this.weightString = newWeight;
 		
-		this.weight = evaluator.evaluate(this.weightString);		
+		try {
+			this.weight = evaluator.evaluate(this.weightString);
+		}
+		catch (NullPointerException e){
+			// variable does not exist
+		}
 	}
 	
 	public void changePlace(Place newPlace) {this.place = newPlace;}
@@ -217,24 +218,22 @@ public class Arc implements Comparable <Arc> {
 	 * then by their transition's priority.
 	 */
 	public int compareTo(Arc other) {
-		
-		if ((other == null) || (this == null))
-			throw new NullPointerException("an arc is null");
-				
 		return this.transition.compareTo(other.transition);
+	}
+	
+	@Override
+	public int hashCode() {
+	    return index == null ? 0 : index;
 	}
 	
 	/**
 	 *  This method is to override the equals method of an object. It 
 	 *  identifies each arc by its index.
 	 */
-	public boolean equals(Arc other) {
-		if (other instanceof Arc){
-			return (this.index == ((Arc) other).index);
-		}
-		else {
-			return false;
-		}
+	@Override
+	public boolean equals(Object other) {
+		return ( (other instanceof Arc) &&
+				this.index.equals( ((Arc) other).index));
 	}
 		
 	/**

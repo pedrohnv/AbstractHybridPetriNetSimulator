@@ -74,4 +74,22 @@ public class ContinuousPlace extends Place {
 		}		
 	}
 	
+	/** 
+	 * This method changes sets the new markings of a place.
+	 * <p>
+	 * It tests if the new value is valid. If not, throws an exception.<p>
+	 * Method overriden because of the casting to integer in the discrete palce.
+	 */
+	@Override
+	public void changeMarkings(double newValue){		
+										
+		if (checkValidMarkings(newValue)){
+			this.markings = newValue;
+		}
+		else {
+			throw new UnsupportedOperationException(
+					"Invalid new markings value, did not change.");
+		}
+	}
+	
 }

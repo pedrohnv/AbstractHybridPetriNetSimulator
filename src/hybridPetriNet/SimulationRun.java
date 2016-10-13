@@ -37,7 +37,9 @@ import hybridPetriNet.petriNets.PetriNet;
 import utilities.LogText;
 
 /**
- * Simulate the Petri net.
+ * Simulate the Petri net.<p>
+ * Initialize the Petri nets and their elements, then call the RunProgram method
+ * to run the simulation with the Petri nets as arguments.
  */
 public abstract class SimulationRun {
 		
@@ -325,5 +327,16 @@ public abstract class SimulationRun {
 	public static String getResultsFileName(){
 		return resultsFileName;
 	}
-		
+	
+	/**
+	 * Initialize the Petri nets and their elements, then call the RunProgram
+	 * method to run the simulation with the Petri nets as arguments.
+	 */
+	/* OLD CODE. This main method is a relic from the time there were no GUI/
+	 * public static void main(String[] args) {
+		PetriNet net = new PetriNet("net 1");
+		// initialize elements and add them to net
+		// Set constants of the Evolution
+		RunProgram(net);
+	}*/
 }

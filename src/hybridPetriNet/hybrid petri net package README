@@ -1,0 +1,31 @@
+## Hybrid Petri Net Package
+
+This package contains the Petri net classes and used objects (place, arc, 
+transition). Here is all the logic of the Petri net; how it behaves.
+
+Each subpackage contains the fundamentals elements of a Petri net with
+the most common elements of a Petri net.
+
+It should be easy enough to extend the fundamental objects to create custom
+objects, which can implement a specific logic.
+
+### Packages
+
+#### Places
+
+#### Arcs
+
+#### Transitions
+
+#### PetriNets
+Implements the behavior in each iteration of the net.
+
+#### Evolution
+Contains global variables, such as time and iteration. It is abstract.
+
+It was the easiest way of the objects knowing the current time or interaction.
+
+#### SimulationRun
+
+This class does the simulation, advancing (and calling) each iteration and
+time step. 

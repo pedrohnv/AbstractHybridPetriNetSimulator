@@ -56,10 +56,6 @@ public class Transition implements Comparable <Transition> {
 	// atomic integer because of multithreading
 	private static AtomicInteger counter = new AtomicInteger(0);
 	
-	/*
-	 *  All objects extending the Abstract super class should have a unique
-	 *  index.
-	 */
 	protected final Integer index;
 	
 	/**
@@ -167,27 +163,22 @@ public class Transition implements Comparable <Transition> {
 	 */	
 	@Override
 	public boolean equals(Object other){
-		if (other instanceof Transition){
-			return (this.index == ((Place) other).getIndex());
-		}
-		else {
-			return false;
-		}
+		return ((other instanceof Transition) && 
+				(this.index.equals( ((Transition) other).getIndex())) );		
+	}
+	
+	@Override
+	public int hashCode() {
+	    return index == null ? 0 : index;
 	}
 	
 	/**
-	 * This method is to compare two transitions based on their priority.
-	 * <p>
+	 * This method is to compare two transitions based on their priority.<p>
+	 * When sort is called, higher priority will come first;
+	 * as if a transition with higher priority was "lesser".<p>
 	 * It is used to solve conflicts between their firing.
 	 */
 	public int compareTo(Transition other) {
-		
-		if ((other == null) || (this == null)) throw new NullPointerException(
-				"a transition is null");
-		/*
-		 * when sort is called, higher priority will come first;
-		 * as if a transition with higher priority was "lesser".
-		 */
 		return (other.priority - this.priority);
 	}	
 		

@@ -21,7 +21,7 @@ A default support for colored Petri nets was not done yet. A recommendation is t
 The code does not support multiple threading. I am not sure there would any real, or truly necessary, performance gain by doing so.
 
 ### TODO
-- GUI;
+- improve GUI, add animations;
 
 - [PNML](http://pnml.lip6.fr) framework;
 
@@ -29,4 +29,4 @@ The code does not support multiple threading. I am not sure there would any real
 
 - a wiki;
 
-- make default support for colored nets (i.e., markings as vectors)?
+- make default support for colored nets (e.g. markings as vectors).

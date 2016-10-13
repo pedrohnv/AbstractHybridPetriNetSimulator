@@ -507,7 +507,7 @@ public class PetriNet {
 		StateSpace SS = new StateSpace(this.placeList, this.arcsMap);
 		
 		// will only consider enabled transitions.
-		SS.integrate(fourthOrderRungeKutta);		
+		SS.integrate(fourthOrderRungeKutta);
 		
 		this.timeUpdateElements();
 	}
